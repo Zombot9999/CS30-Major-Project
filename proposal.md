@@ -1,10 +1,24 @@
 # Project Description
-My Project will be about...
+My Project will be an improvement of the grid assignment where the player is able to move and dodge certain attack patterns.
 
 ## Needs To Have List
-- thing 1
-- thing 2
+- A start screen instead of just being thrown into the game
+- Instructions
+- A better movement system
+- Level selection screen 
+- At least 1 level 
+- Different attacks happening as time goes on
+- Grading system where the player gets a rating on how well they did
+- A currency the player gets when they win
+- Sound effects
 
 ## Nice To Have List
-- other thing 1
-- other thing 2
+- A dash function
+- Player becomes invincible during dash
+- A shop to change player skins
+- A progress bar to show how close the player is to beating the level
+- Music that goes with the attacks
+- Difficulty selection 
+    - Normal
+    - Hardcore
+    - Easy
