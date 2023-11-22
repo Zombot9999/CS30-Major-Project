@@ -99,9 +99,6 @@ class Attacks{
   spawnLinesXAxis() {
     if (this.linesAttackX && millis() > this.spawnLinesXTimer) {
       this.spawnLinesXTimer = millis() + this.spawnLinesCooldown;
-      for (let lineX = 0; lineX < rows; lineX++) {
-        grid[this.spawnLinesY][lineX] = 0; 
-      }
       this.spawnLinesY = floor(random(0, columns));
       for (let lineX = 0; lineX < rows; lineX++) {
         if (grid[this.spawnLinesY][lineX] === 0) {
@@ -129,9 +126,6 @@ class Attacks{
   spawnLinesYAxis() {
     if (this.linesAttackY && millis() > this.spawnLinesYTimer) {
       this.spawnLinesYTimer = millis() + this.spawnLinesCooldown;
-      for (let lineY = 0; lineY < columns; lineY++) {
-        grid[lineY][this.spawnLinesX] = 0; 
-      }
       this.spawnLinesX = floor(random(0, rows));
       for (let lineY = 0; lineY < columns; lineY++) {
         if (grid[lineY][this.spawnLinesX] === 0) {
@@ -144,7 +138,6 @@ class Attacks{
   }
 }
 
-// General Variables
 let grid;
 let cellSize = 75;
 let rows;
@@ -163,8 +156,10 @@ function setup() {
   moves.randomSpawnCooldown = int(moves.randomSpawnCooldown);
   
   player = {
-    x: 0,
-    y: 0,
+    x: width/2,
+    y: height/2,
+    dx: 10,
+    dy: 10,
     size: cellSize,
     livesMax: 3,
     lives: 3,
@@ -180,6 +175,7 @@ function draw() {
   background(220);
   displayGrid();
   displayPlayer();
+  movePlayer();
   livesSystem();
   moves.spawnOnPlayer();
   moves.spawnLinesYAxis(); 
@@ -234,12 +230,12 @@ function gameOver() {
 
 // Check if the player has died and reduce lives
 function livesSystem() {
-  if ((grid[player.y][player.x] === 4 || grid[player.y][player.x] === 4.5) && player.iFrame === false && player.lives > 0) {
-    player.lives -= 1;
-    player.iFrame = true;
-    player.iFrameTimer = millis() + 2000;
-    player.color = "blue";
-  }
+  // if (player.iFrame === false && player.lives > 0) {
+  //   player.lives += 1;
+  //   player.iFrame = true;
+  //   player.iFrameTimer = millis() + 2000;
+  //   player.color = "blue";
+  // }
   if (player.lives <= 0) {
     gameOver();
   }
@@ -258,7 +254,7 @@ function displayPlayer() {
   rectMode(CENTER);
   textAlign(CENTER);
   fill(player.color);
-  rect(player.x * cellSize + cellSize/2, player.y * cellSize + cellSize/2, player.size, player.size);
+  rect(player.x, player.y, player.size);
 
   if (player.lives === player.livesMax) {
     fill("green");
@@ -270,27 +266,52 @@ function displayPlayer() {
     fill("red");
   }
   stroke(5);
-  textFont("Courier New", player.size/2);
+  textFont("Courier New", player.size);
   textStyle(BOLD);
-  text(player.lives, player.x * cellSize + cellSize/2, (player.y + 1) * cellSize - cellSize/4, player.size, player.size);
+  text(player.lives, player.x, player.y, player.size, player.size);
   rectMode(CORNER);
+}
+
+function movePlayer() {
+  if (keyIsDown(87)) {
+    if (player.y - player.dy < 0 + player.size/2) {
+      player.y = 0 + player.size/2;
+    }
+    else {
+      player.y -= player.dy;
+    }
+  }
+  if (keyIsDown(83)) {
+    if (player.y + player.dy > columns*cellSize - player.size/2) {
+      player.y = columns*cellSize - cellSize/2;
+    }
+    else {
+      player.y += player.dy;
+    }
+  }
+  if (keyIsDown(65)) {
+    player.x -= player.dx;
+  }
+  if (keyIsDown(68) && player.x < rows*cellSize - player.size/2) {
+    player.x += player.dx;
+  }
 }
 
 // Key type functions
 function keyTyped() {
   // Player movement
-  if (key === "s" && player.y < columns - 1 && player.lives > 0) {
-    player.y = player.y + 1;
-  }
-  if (key === "w" && player.y > 0 && player.lives > 0) {
-    player.y = player.y - 1;
-  }
-  if (key === "d" && player.x < rows - 1 && player.lives > 0) {
-    player.x = player.x + 1;
-  }
-  if (key === "a" && player.x > 0 && player.lives > 0) {
-    player.x = player.x - 1;
-  }
+  // if (key === "s" && player.y < columns - 1 && player.lives > 0) {
+  //   player.y = player.y + 1;
+  // }
+  // if (key === "w" && player.y > 0 && player.lives > 0) {
+  //   player.y = player.y - 1;
+  // }
+  // if (key === "d" && player.x < rows - 1 && player.lives > 0) {
+  //   player.x = player.x + 1;
+  // }
+  // if (key === "a" && player.x > 0 && player.lives > 0) {
+  //   player.x = player.x - 1;
+  // }
 
   // Other functions
   if (key === "v") {
@@ -344,7 +365,9 @@ function displayGrid() {
         fill(253, 31, 108);
         rect(x * cellSize, y * cellSize, cellSize, cellSize);
         setTimeout(() => {
-          grid[y][x] = 0; 
+          if (grid[y][x] === 4 || grid[y][x] === 4.5) {
+            grid[y][x] = 0; 
+          }
         }, 2000);
       }
 
