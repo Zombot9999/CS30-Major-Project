@@ -139,7 +139,7 @@ class Attacks{
 }
 
 let grid;
-let cellSize = 75;
+let cellSize = 50;
 let rows;
 let columns; 
 let player;
@@ -158,8 +158,8 @@ function setup() {
   player = {
     x: width/2,
     y: height/2,
-    dx: 10,
-    dy: 10,
+    dx: 1,
+    dy: 1,
     size: cellSize,
     livesMax: 3,
     lives: 3,
@@ -230,12 +230,12 @@ function gameOver() {
 
 // Check if the player has died and reduce lives
 function livesSystem() {
-  // if (player.iFrame === false && player.lives > 0) {
-  //   player.lives += 1;
-  //   player.iFrame = true;
-  //   player.iFrameTimer = millis() + 2000;
-  //   player.color = "blue";
-  // }
+  if (player.iFrame === false && player.lives > 0 && (grid[floor((player.y+player.size/2)/cellSize)][floor((player.x+player.size/2)/cellSize)] === 4.5 || grid[floor((player.y-player.size/2)/cellSize)][floor((player.x+player.size/2)/cellSize)] === 4.5)) {
+    player.lives -= 1;
+    player.iFrame = true;
+    player.iFrameTimer = millis() + 2000;
+    player.color = "blue";
+  }
   if (player.lives <= 0) {
     gameOver();
   }
@@ -273,27 +273,39 @@ function displayPlayer() {
 }
 
 function movePlayer() {
-  if (keyIsDown(87)) {
-    if (player.y - player.dy < 0 + player.size/2) {
-      player.y = 0 + player.size/2;
+  if (player.lives > 0) {
+    if (keyIsDown(87)) {
+      if (player.y - player.dy < 0 + player.size/2) {
+        player.y = 0 + player.size/2;
+      }
+      else {
+        player.y -= player.dy;
+      }
     }
-    else {
-      player.y -= player.dy;
+    if (keyIsDown(83)) {
+      if (player.y + player.dy > columns*cellSize - player.size/2) {
+        player.y = columns*cellSize - cellSize/2;
+      }
+      else {
+        player.y += player.dy;
+      }
     }
-  }
-  if (keyIsDown(83)) {
-    if (player.y + player.dy > columns*cellSize - player.size/2) {
-      player.y = columns*cellSize - cellSize/2;
+    if (keyIsDown(65)) {
+      if (player.x - player.dx < 0 + player.size/2) {
+        player.x = 0 + player.size/2;
+      }
+      else {
+        player.x -= player.dx;
+      }
     }
-    else {
-      player.y += player.dy;
+    if (keyIsDown(68)) {
+      if (player.x + player.dx > rows*cellSize - player.size/2) {
+        player.x = rows*cellSize - player.size/2;
+      }
+      else {
+        player.x += player.dx;
+      }
     }
-  }
-  if (keyIsDown(65)) {
-    player.x -= player.dx;
-  }
-  if (keyIsDown(68) && player.x < rows*cellSize - player.size/2) {
-    player.x += player.dx;
   }
 }
 
