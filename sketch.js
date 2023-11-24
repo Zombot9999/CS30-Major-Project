@@ -110,17 +110,6 @@ class Attacks{
     }
   }
   
-  // Spawns a kill block on the player
-  spawnOnPlayer() {
-    if (this.spawnPlayer) {
-      this.spawnOnPlayerX = player.x;
-      this.spawnOnPlayerY = player.y;
-      
-      if (grid[this.spawnOnPlayerY][this.spawnOnPlayerX] === 0) {
-        grid[this.spawnOnPlayerY][this.spawnOnPlayerX] = 1;
-      }
-    }
-  }
 
   // Spawns vertical lines going from top to bottom in a random x spot
   spawnLinesYAxis() {
@@ -136,6 +125,21 @@ class Attacks{
       }
     }
   }
+
+  // Spawns a kill block on the player
+  // spawnOnPlayer() {
+  //   if (this.spawnPlayer && (grid[floor((player.y+player.size/2)/cellSize)][floor((player.x+player.size/2)/cellSize)] === 0 
+  //     || grid[floor((player.y-player.size/2)/cellSize)][floor((player.x+player.size/2)/cellSize)] === 0
+  //     || grid[floor((player.y+player.size/2)/cellSize)][floor((player.x-player.size/2)/cellSize)] === 0
+  //     || grid[floor((player.y-player.size/2)/cellSize)][floor((player.x-player.size/2)/cellSize)] === 0)) {
+
+  //     grid[floor((player.y+player.size/2)/cellSize)][floor((player.x+player.size/2)/cellSize)] = 1;
+  //     grid[floor((player.y-player.size/2)/cellSize)][floor((player.x+player.size/2)/cellSize)] = 1;
+  //     grid[floor((player.y+player.size/2)/cellSize)][floor((player.x-player.size/2)/cellSize)] = 1;
+  //     grid[floor((player.y-player.size/2)/cellSize)][floor((player.x-player.size/2)/cellSize)] = 1;
+
+  //   }
+  // }
 }
 
 let grid;
@@ -158,9 +162,9 @@ function setup() {
   player = {
     x: width/2,
     y: height/2,
-    dx: 1,
-    dy: 1,
-    size: cellSize,
+    dx: 5,
+    dy: 5,
+    size: cellSize/2,
     livesMax: 3,
     lives: 3,
     iFrame: false,
@@ -177,7 +181,7 @@ function draw() {
   displayPlayer();
   movePlayer();
   livesSystem();
-  moves.spawnOnPlayer();
+  // moves.spawnOnPlayer();
   moves.spawnLinesYAxis(); 
   moves.spawnLinesXAxis();
   moves.randomSpawn();
@@ -230,7 +234,13 @@ function gameOver() {
 
 // Check if the player has died and reduce lives
 function livesSystem() {
-  if (player.iFrame === false && player.lives > 0 && (grid[floor((player.y+player.size/2)/cellSize)][floor((player.x+player.size/2)/cellSize)] === 4.5 || grid[floor((player.y-player.size/2)/cellSize)][floor((player.x+player.size/2)/cellSize)] === 4.5)) {
+  if (player.iFrame === false && player.lives > 0 
+    && (floor((player.y+player.size/2)/cellSize) < columns 
+    && grid[floor((player.y+player.size/2)/cellSize)][floor((player.x+player.size/2)/cellSize)] === 4.5 
+    || grid[floor((player.y-player.size/2)/cellSize)][floor((player.x+player.size/2)/cellSize)] === 4.5
+    || floor((player.y+player.size/2)/cellSize) < columns 
+    && grid[floor((player.y+player.size/2)/cellSize)][floor((player.x-player.size/2)/cellSize)] === 4.5
+    || grid[floor((player.y-player.size/2)/cellSize)][floor((player.x-player.size/2)/cellSize)] === 4.5)) {
     player.lives -= 1;
     player.iFrame = true;
     player.iFrameTimer = millis() + 2000;
@@ -284,7 +294,7 @@ function movePlayer() {
     }
     if (keyIsDown(83)) {
       if (player.y + player.dy > columns*cellSize - player.size/2) {
-        player.y = columns*cellSize - cellSize/2;
+        player.y = columns*cellSize - player.size/2;
       }
       else {
         player.y += player.dy;
