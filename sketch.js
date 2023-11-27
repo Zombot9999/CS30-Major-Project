@@ -24,7 +24,7 @@ class Attacks{
     // Variables for randomSpawn()
     this.randomSpawnTimer = 0;
     this.spawnRandom = false;
-    this.randomSpawnCooldown = 2000;
+    this.randomSpawnCooldown = 3000;
 
   }
 
@@ -321,21 +321,6 @@ function movePlayer() {
 
 // Key type functions
 function keyTyped() {
-  // Player movement
-  // if (key === "s" && player.y < columns - 1 && player.lives > 0) {
-  //   player.y = player.y + 1;
-  // }
-  // if (key === "w" && player.y > 0 && player.lives > 0) {
-  //   player.y = player.y - 1;
-  // }
-  // if (key === "d" && player.x < rows - 1 && player.lives > 0) {
-  //   player.x = player.x + 1;
-  // }
-  // if (key === "a" && player.x > 0 && player.lives > 0) {
-  //   player.x = player.x - 1;
-  // }
-
-  // Other functions
   if (key === "v") {
     moves.linesAttackY = !moves.linesAttackY;
   }
@@ -384,12 +369,13 @@ function displayGrid() {
 
       else if (grid[y][x] === 4) {
         grid[y][x] = 4.5;
-        fill(253, 31, 108);
+        fill("white");
+        setTimeout(() => {
+          fill(253, 31, 108);
+        }, 250);
         rect(x * cellSize, y * cellSize, cellSize, cellSize);
         setTimeout(() => {
-          if (grid[y][x] === 4 || grid[y][x] === 4.5) {
-            grid[y][x] = 0; 
-          }
+          grid[y][x] = 0; 
         }, 2000);
       }
 
