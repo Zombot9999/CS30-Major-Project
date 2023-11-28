@@ -8,13 +8,10 @@ class Attacks{
   constructor() {
 
     // Variables for spawnLinesYAxis() and spawnLinesXAxis()
-    this.linesAttackY = false;
-    this.linesAttackX = false;
     this.spawnLinesYTimer = 0;
     this.spawnLinesXTimer = 0;
     this.spawnLinesX = 0;
     this.spawnLinesY = 0;
-    this.spawnLinesCooldown = 4500;
     
     // Variables for spawnOnPlayer() 
     this.spawnPlayer = false;
@@ -96,15 +93,15 @@ class Attacks{
   }
   
   // Spawns horizontal lines going from left to right in a random y spot
-  spawnLinesXAxis() {
+  spawnLinesXAxis(minRange, maxRange, cooldown, speed) {
     if (this.linesAttackX && millis() > this.spawnLinesXTimer) {
-      this.spawnLinesXTimer = millis() + this.spawnLinesCooldown;
+      this.spawnLinesXTimer = millis() + cooldown;
       this.spawnLinesY = floor(random(0, columns));
-      for (let lineX = 0; lineX < rows; lineX++) {
+      for (let lineX = minRange; lineX < maxRange; lineX++) {
         if (grid[this.spawnLinesY][lineX] === 0) {
           setTimeout(() => {
             grid[this.spawnLinesY][lineX] = 1; 
-          }, 100 * lineX);
+          }, speed * lineX);
         }
       }
     }
@@ -112,15 +109,15 @@ class Attacks{
   
 
   // Spawns vertical lines going from top to bottom in a random x spot
-  spawnLinesYAxis() {
+  spawnLinesYAxis(minRange, maxRange, cooldown, speed) {
     if (this.linesAttackY && millis() > this.spawnLinesYTimer) {
-      this.spawnLinesYTimer = millis() + this.spawnLinesCooldown;
+      this.spawnLinesYTimer = millis() + cooldown;
       this.spawnLinesX = floor(random(0, rows));
-      for (let lineY = 0; lineY < columns; lineY++) {
+      for (let lineY = minRange; lineY < maxRange; lineY++) {
         if (grid[lineY][this.spawnLinesX] === 0) {
           setTimeout(() => {
             grid[lineY][this.spawnLinesX] = 1;
-          }, 100 * lineY);
+          }, speed * lineY);
         }
       }
     }
@@ -149,6 +146,8 @@ let columns;
 let player;
 let score = 0;
 let moves = new Attacks;
+let moves2 = new Attacks;
+let dashCooldown = 0;
 
 
 // Create canvas, set variables and make an empty grid
@@ -156,8 +155,6 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   columns = floor(windowHeight/cellSize);
   rows = floor(windowWidth/cellSize);
-  moves.spawnLinesCooldown = int(moves.spawnLinesCooldown);
-  moves.randomSpawnCooldown = int(moves.randomSpawnCooldown);
   
   player = {
     x: width/2,
@@ -165,8 +162,8 @@ function setup() {
     dx: 5,
     dy: 5,
     size: cellSize/2,
-    livesMax: 3,
-    lives: 3,
+    livesMax: 100,
+    lives: 99,
     iFrame: false,
     iFrameTimer: 0,
     color: "cyan",
@@ -182,8 +179,8 @@ function draw() {
   movePlayer();
   livesSystem();
   // moves.spawnOnPlayer();
-  moves.spawnLinesYAxis(); 
-  moves.spawnLinesXAxis();
+  moves.spawnLinesYAxis(0, columns, 3000, 50);
+  moves.spawnLinesXAxis(0, rows, 3000, 25);
   moves.randomSpawn();
 }
 
@@ -253,6 +250,9 @@ function livesSystem() {
     player.iFrame = false;
     player.color = "cyan";
   }
+  else {
+    player.iFrame = true;
+  }
   if (player.lives > 0) {
     score = floor(millis() / 100);
   }
@@ -284,6 +284,20 @@ function displayPlayer() {
 
 function movePlayer() {
   if (player.lives > 0) {
+    if (keyIsDown(32) && millis() > dashCooldown) {
+      dashCooldown = millis() + 500;
+      for (let i = 0; i <= 20; i++) {
+        setTimeout(() => {
+          player.dx += 5;
+          player.dy += 5; 
+        }, 10 * i);
+      }
+      if (player.iFrame === false) {
+        player.iFrameTimer = millis() + 100;
+        player.iFrame = true;
+      }
+      console.log("dashed");
+    }
     if (keyIsDown(87)) {
       if (player.y - player.dy < 0 + player.size/2) {
         player.y = 0 + player.size/2;
@@ -315,6 +329,12 @@ function movePlayer() {
       else {
         player.x += player.dx;
       }
+    }
+    player.dx = 5;
+    player.dy = 5;
+    if (millis() > player.iFrameTimer) {
+      player.iFrame = false;
+      player.color = "cyan";
     }
   }
 }
@@ -355,7 +375,6 @@ function displayGrid() {
       if (grid[y][x] === 1) {   
         grid[y][x] = 1.5;
         fill(170, 21, 87);
-        rect(x * cellSize, y * cellSize, cellSize, cellSize);
         setTimeout(() => {
           grid[y][x] = 4; 
         }, 500);
@@ -364,25 +383,22 @@ function displayGrid() {
       // Value 1.5 is similar to one and prevents the setTimeout() from happening more than once
       else if (grid[y][x] === 1.5) {
         fill(170, 21, 87);
-        rect(x * cellSize, y * cellSize, cellSize, cellSize);
       }
 
       else if (grid[y][x] === 4) {
-        grid[y][x] = 4.5;
         fill("white");
         setTimeout(() => {
           fill(253, 31, 108);
         }, 250);
-        rect(x * cellSize, y * cellSize, cellSize, cellSize);
         setTimeout(() => {
           grid[y][x] = 0; 
         }, 2000);
+        grid[y][x] = 4.5;
       }
 
       // Value 4.5 is similar to one and prevents the setTimeout() from happening more than once
       else if (grid[y][x] === 4.5) {
         fill(253, 31, 108);
-        rect(x * cellSize, y * cellSize, cellSize, cellSize);
       }
 
       else if (grid[y][x] === 0) {
