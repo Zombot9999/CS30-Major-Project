@@ -4,11 +4,11 @@ My Project will be an improvement of the grid assignment where the player is abl
 ## Needs To Have List
 - A start screen instead of just being thrown into the game
 - Instructions
-- A better movement system 
-    - Player can move freely without being trapped in a square
-    - Player can hold WASD instead of having to spam WASD to move
-- A dash function
-- Player becomes invincible during dash
+- A better movement system ✓
+    - Player can move freely without being trapped in a square ✓ 
+    - Player can hold WASD instead of having to spam WASD to move ✓
+- A dash function ✓
+- Player becomes invincible during dash ✓
 - At least 1 level 
 - Different attacks happening as time goes on
 - Grading system where the player gets a rating on how well they did

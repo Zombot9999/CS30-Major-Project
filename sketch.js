@@ -93,16 +93,15 @@ class Attacks{
   }
   
   // Spawns horizontal lines going from left to right in a random y spot
-  spawnLinesXAxis(minRange, maxRange, cooldown, speed) {
-    if (this.linesAttackX && millis() > this.spawnLinesXTimer) {
-      this.spawnLinesXTimer = millis() + cooldown;
-      this.spawnLinesY = floor(random(0, columns));
-      for (let lineX = minRange; lineX < maxRange; lineX++) {
-        if (grid[this.spawnLinesY][lineX] === 0) {
-          setTimeout(() => {
-            grid[this.spawnLinesY][lineX] = 1; 
-          }, speed * lineX);
-        }
+  spawnLinesXAxis(minRange, maxRange, speed) {
+    // if (this.linesAttackX && millis() > this.spawnLinesXTimer) {
+    // this.spawnLinesXTimer = millis() + cooldown;
+    this.spawnLinesY = floor(random(0, columns));
+    for (let lineX = minRange; lineX < maxRange; lineX++) {
+      if (grid[this.spawnLinesY][lineX] === 0) {
+        setTimeout(() => {
+          grid[this.spawnLinesY][lineX] = 1; 
+        }, speed * lineX);
       }
     }
   }
@@ -173,6 +172,7 @@ function setup() {
 }
 
 function draw() {
+  noStroke();
   background(220);
   displayGrid();
   displayPlayer();
@@ -180,13 +180,15 @@ function draw() {
   livesSystem();
   // moves.spawnOnPlayer();
   moves.spawnLinesYAxis(0, columns, 3000, 50);
-  moves.spawnLinesXAxis(0, rows, 3000, 25);
+  setTimeout(() => {
+    moves.spawnLinesXAxis(0, rows, 25);
+    moves.spawnLinesXAxis(0, rows, 25);
+  }, 3000 * moves.spawnLinesXTimer);
   moves.randomSpawn();
+  moves.spawnLinesXTimer++;
 }
 
-function diagonalMove(x, y, direction) {
-  let movement = true;
-  
+function diagonalMove(x, y, direction) {  
   for (let i = 0; i < columns && i >= 0; i++) {
 
     if (direction === "northwest" && x < rows && x >= 0) {
