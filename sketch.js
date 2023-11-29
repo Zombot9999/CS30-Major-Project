@@ -293,10 +293,9 @@ function movePlayer() {
         }, 10 * i);
       }
       if (player.iFrame === false) {
-        player.iFrameTimer = millis() + 100;
+        player.iFrameTimer = millis() + 200;
         player.iFrame = true;
       }
-      console.log("dashed");
     }
     if (keyIsDown(87)) {
       if (player.y - player.dy < 0 + player.size/2) {
