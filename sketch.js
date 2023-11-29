@@ -93,15 +93,16 @@ class Attacks{
   }
   
   // Spawns horizontal lines going from left to right in a random y spot
-  spawnLinesXAxis(minRange, maxRange, speed) {
-    // if (this.linesAttackX && millis() > this.spawnLinesXTimer) {
+  spawnLinesXAxis(minRange, maxRange, speed, yLocation) {
+    if (this.linesAttackX) {
     // this.spawnLinesXTimer = millis() + cooldown;
-    this.spawnLinesY = floor(random(0, columns));
-    for (let lineX = minRange; lineX < maxRange; lineX++) {
-      if (grid[this.spawnLinesY][lineX] === 0) {
-        setTimeout(() => {
-          grid[this.spawnLinesY][lineX] = 1; 
-        }, speed * lineX);
+      this.spawnLinesY = yLocation;
+      for (let lineX = minRange; lineX < maxRange; lineX++) {
+        if (grid[this.spawnLinesY][lineX] === 0) {
+          setTimeout(() => {
+            grid[this.spawnLinesY][lineX] = 1; 
+          }, speed * lineX);
+        }
       }
     }
   }
@@ -148,7 +149,6 @@ let moves = new Attacks;
 let moves2 = new Attacks;
 let dashCooldown = 0;
 
-
 // Create canvas, set variables and make an empty grid
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -181,11 +181,14 @@ function draw() {
   // moves.spawnOnPlayer();
   moves.spawnLinesYAxis(0, columns, 3000, 50);
   setTimeout(() => {
-    moves.spawnLinesXAxis(0, rows, 25);
-    moves.spawnLinesXAxis(0, rows, 25);
+    moves.spawnLinesXAxis(0, rows, 25, floor(random(0, columns)));
+    // moves2.spawnLinesXAxis(0, rows, 25, floor(2));
+    moves.spawnLinesXAxis(0, rows, 25, floor(3));
+    // moves2.spawnLinesXAxis(0, rows, 25, floor(4));
   }, 3000 * moves.spawnLinesXTimer);
   moves.randomSpawn();
   moves.spawnLinesXTimer++;
+  // moves2.spawnLinesXTimer++;
 }
 
 function diagonalMove(x, y, direction) {  
@@ -344,15 +347,19 @@ function movePlayer() {
 function keyTyped() {
   if (key === "v") {
     moves.linesAttackY = !moves.linesAttackY;
+    moves2.linesAttackY = !moves2.linesAttackY;
   }
   if (key === "h") {
     moves.linesAttackX = !moves.linesAttackX;
+    moves2.linesAttackX = !moves2.linesAttackX;
   }
   if (key === "p") {
     moves.spawnPlayer = !moves.spawnPlayer;
+    moves2.spawnPlayer = !moves2.spawnPlayer;
   }
   if (key === "r") {
     moves.spawnRandom = !moves.spawnRandom;
+    moves2.spawnRandom = !moves2.spawnRandom;
   }
 }
 
