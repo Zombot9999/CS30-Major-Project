@@ -12,15 +12,17 @@ class Attacks{
     this.spawnLinesXTimer = 0;
     this.spawnLinesX = 0;
     this.spawnLinesY = 0;
+    this.linesAttackX = true;
+    this.linesAttackY = true;
     
     // Variables for spawnOnPlayer() 
-    this.spawnPlayer = false;
+    this.spawnPlayer = true;
     this.spawnOnPlayerY = 0;
     this.spawnOnPlayerX = 0;
     
     // Variables for randomSpawn()
     this.randomSpawnTimer = 0;
-    this.spawnRandom = false;
+    this.spawnRandom = true;
     this.randomSpawnCooldown = 3000;
 
   }
@@ -140,7 +142,7 @@ class Attacks{
 }
 
 let grid;
-let cellSize = 50;
+let cellSize = 60;
 let rows;
 let columns; 
 let player;
@@ -171,6 +173,8 @@ function setup() {
   grid = makeEmptyGrid(columns, rows);
 }
 
+let level = true;
+
 function draw() {
   noStroke();
   background(220);
@@ -178,17 +182,27 @@ function draw() {
   displayPlayer();
   movePlayer();
   livesSystem();
-  // moves.spawnOnPlayer();
-  moves.spawnLinesYAxis(0, columns, 3000, 50);
-  setTimeout(() => {
-    moves.spawnLinesXAxis(0, rows, 25, floor(random(0, columns)));
-    // moves2.spawnLinesXAxis(0, rows, 25, floor(2));
+  // // moves.spawnOnPlayer();
+  // moves.spawnLinesYAxis(0, columns, 3000, 50);
+  // setTimeout(() => {
+  //   moves.spawnLinesXAxis(0, rows, 25, floor(random(0, columns)));
+  //   // moves2.spawnLinesXAxis(0, rows, 25, floor(2));
+  //   moves.spawnLinesXAxis(0, rows, 25, floor(3));
+  //   // moves2.spawnLinesXAxis(0, rows, 25, floor(4));
+  // }, 3000 * moves.spawnLinesXTimer);
+  // moves.randomSpawn();
+  // moves.spawnLinesXTimer++;
+  // // moves2.spawnLinesXTimer++;
+  game();
+}
+
+function game() {
+  if (level) {
+    level = false;
+    moves2.spawnLinesXAxis(0, rows, 25, floor(2));
     moves.spawnLinesXAxis(0, rows, 25, floor(3));
-    // moves2.spawnLinesXAxis(0, rows, 25, floor(4));
-  }, 3000 * moves.spawnLinesXTimer);
-  moves.randomSpawn();
-  moves.spawnLinesXTimer++;
-  // moves2.spawnLinesXTimer++;
+    moves2.spawnLinesXAxis(0, rows, 25, floor(4));
+  }
 }
 
 function diagonalMove(x, y, direction) {  
@@ -237,12 +251,14 @@ function gameOver() {
 // Check if the player has died and reduce lives
 function livesSystem() {
   if (player.iFrame === false && player.lives > 0 
+    // Hitbox detection (I know it looks really messy...)
     && (floor((player.y+player.size/2)/cellSize) < columns 
     && grid[floor((player.y+player.size/2)/cellSize)][floor((player.x+player.size/2)/cellSize)] === 4.5 
     || grid[floor((player.y-player.size/2)/cellSize)][floor((player.x+player.size/2)/cellSize)] === 4.5
     || floor((player.y+player.size/2)/cellSize) < columns 
     && grid[floor((player.y+player.size/2)/cellSize)][floor((player.x-player.size/2)/cellSize)] === 4.5
     || grid[floor((player.y-player.size/2)/cellSize)][floor((player.x-player.size/2)/cellSize)] === 4.5)) {
+
     player.lives -= 1;
     player.iFrame = true;
     player.iFrameTimer = millis() + 2000;
