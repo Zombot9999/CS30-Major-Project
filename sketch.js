@@ -96,6 +96,7 @@ class Attacks{
   
   // Spawns horizontal lines going from left to right in a random y spot
   spawnLinesXAxis(minRange, maxRange, speed, yLocation) {
+    
     if (this.linesAttackX) {
     // this.spawnLinesXTimer = millis() + cooldown;
       this.spawnLinesY = yLocation;
@@ -107,6 +108,7 @@ class Attacks{
         }
       }
     }
+    console.log(minRange, maxRange, speed, yLocation);
   }
   
 
