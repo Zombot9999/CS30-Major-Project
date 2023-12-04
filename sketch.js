@@ -2,6 +2,31 @@
 // Tareen Perera
 // Nov 21, 2023
 
+class Particle {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.dx = random(-0.5, 0.5);
+    this.dy = random(-0.5, 0.5);
+    this.alpha = 255;
+    this.timer = 1500; 
+    this.size = 10;
+  }
+
+  update() {
+    this.x += this.dx;
+    this.y += this.dy;
+    this.timer -= 20;
+    this.alpha = map(this.timer, 1500, 0, 255, 0);
+    this.size = map(this.timer, 1500, 0, 10, 0);
+  }
+
+  display() {
+    fill(12, 128, 239, this.alpha);
+    rect(this.x, this.y, this.size, this.size); 
+  }
+}
+
 let particles = [];
 let lastSpawnTime = 0;
 let spawnInterval = 100;
@@ -10,16 +35,20 @@ let player;
 function setup() {
   createCanvas(windowWidth, windowHeight);
   noStroke();
+  rectMode(CENTER);
 
   player = {
     x: width/2,
     y: height/2,
     dx: 5,
     dy: 5,
+    dashTimer: 0,
+    dashCooldown: 500,
     width: 20,
     height: 20,
     stretchedMax: 24,
     stretchedMin: 18,
+    nonStretchedSize: 20,
     color: color(0, 254, 255),
   };
 }
@@ -28,6 +57,7 @@ function draw() {
   background(23, 17, 28);
   showParticles();
   displaySquare();
+  playerBorders();
   move();
 }
 
@@ -48,6 +78,25 @@ function showParticles() {
   }
 }
 
+function playerBorders() {
+  // Right border
+  if (player.x + player.nonStretchedSize/2 > width) { 
+    player.x = width - player.nonStretchedSize/2;
+  }
+  // Left border
+  if (player.x - player.nonStretchedSize/2 < 0) { 
+    player.x = player.nonStretchedSize/2;
+  }
+  // Top border
+  if (player.y - player.nonStretchedSize/2 < 0) { 
+    player.y = player.nonStretchedSize/2;
+  }
+  // Bottom border
+  if (player.y + player.nonStretchedSize/2 > height) { 
+    player.y = height - player.nonStretchedSize/2;
+  }
+}
+
 function displaySquare() {
   fill(player.color);
   rect(player.x, player.y, player.width, player.height);
@@ -56,14 +105,26 @@ function displaySquare() {
 function move() {
   let isMoving = false;
 
+  if (keyIsDown(32) && millis() > player.dashTimer) {
+    for (let i = 0; i <= 15; i++) {
+      setTimeout(() => {
+        player.dx += 6;
+        player.dy += 6;
+        let newParticle = new Particle(player.x + random(-5, 5), player.y + random(-5, 5));      
+        particles.push(newParticle);
+      }, 10 * i);
+    }
+    player.dashTimer = millis() + player.dashCooldown;
+  }
+
   // A Key - Move left
-  if (keyIsDown(65)) {
+  if (keyIsDown(65) && player.x - player.nonStretchedSize/2 > 0) { 
     player.x -= player.dx;
     isMoving = true;
 
     if (keyIsDown(87) || keyIsDown(83)) {
-      player.width = 20;
-      player.height = 20;
+      player.width = player.nonStretchedSize;
+      player.height = player.nonStretchedSize;
     }
     else {
       player.width = player.stretchedMax;
@@ -72,28 +133,28 @@ function move() {
   }
 
   // D Key - Move right
-  if (keyIsDown(68)) {
-    player.x += player.dx;
-    isMoving = true;
-
+  if (keyIsDown(68) && player.x + player.nonStretchedSize/2 < width) {
     if (keyIsDown(87) || keyIsDown(83)) {
-      player.width = 20;
-      player.height = 20;
+      player.width = player.nonStretchedSize;
+      player.height = player.nonStretchedSize;
     }
     else {
       player.width = player.stretchedMax;
       player.height = player.stretchedMin;
     }
+
+    player.x += player.dx;
+    isMoving = true;
   }
 
   // W Key - Move up
-  if (keyIsDown(87)) {
+  if (keyIsDown(87) && player.y - player.nonStretchedSize/2 > 0) {
     player.y -= player.dy;
     isMoving = true;
 
     if (keyIsDown(68) || keyIsDown(65)) {
-      player.width = 20;
-      player.height = 20;
+      player.width = player.nonStretchedSize;
+      player.height = player.nonStretchedSize;
     }
     else {
       player.width = player.stretchedMin;
@@ -102,13 +163,13 @@ function move() {
   }
 
   // S Key - Move down
-  if (keyIsDown(83)) {
+  if (keyIsDown(83) && player.y + player.nonStretchedSize/2 < height) {
     player.y += player.dy;
     isMoving = true;
 
     if (keyIsDown(68) || keyIsDown(65)) {
-      player.width = 20;
-      player.height = 20;
+      player.width = player.nonStretchedSize;
+      player.height = player.nonStretchedSize;
     }
     else {
       player.width = player.stretchedMin;
@@ -117,35 +178,14 @@ function move() {
   }
 
   if (!isMoving) {
-    player.width = 20;
-    player.height = 20;
+    player.width = player.nonStretchedSize;
+    player.height = player.nonStretchedSize;
   }
+
+  player.dx = 5;
+  player.dy = 5;
 }
 
-class Particle {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.dx = random(-0.5, 0.5);
-    this.dy = random(-0.5, 0.5);
-    this.alpha = 255;
-    this.timer = 1500; 
-    this.size = 10;
-  }
-
-  update() {
-    this.x += this.dx;
-    this.y += this.dy;
-    this.timer -= 15;
-    this.alpha = map(this.timer, 1500, 0, 255, 0);
-    this.size = map(this.timer, 1500, 0, 10, 0)
-  }
-
-  display() {
-    fill(12, 128, 239, this.alpha);
-    rect(this.x, this.y, this.size, this.size); 
-  }
-}
 
 // // A class consisting of all attacks
 // class Attacks{
