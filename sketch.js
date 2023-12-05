@@ -31,11 +31,14 @@ let particles = [];
 let lastSpawnTime = 0;
 let spawnInterval = 100;
 let player;
+let playerAvatar;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   noStroke();
   rectMode(CENTER);
+  c = createshape("circle", 200, 200, 100, 100);
+  c.color = "green";
 
   player = {
     x: width/2,
@@ -50,15 +53,17 @@ function setup() {
     stretchedMin: 18,
     nonStretchedSize: 20,
     color: color(0, 254, 255),
+    moved: false,
   };
 }
-
 function draw() {
   background(23, 17, 28);
   showParticles();
   displaySquare();
   playerBorders();
   move();
+  drawsprites();
+
 }
 
 function showParticles() {
@@ -66,7 +71,6 @@ function showParticles() {
     particles.push(new Particle(player.x, player.y));
     lastSpawnTime = millis();
   }
-  
   // Update and display all particles
   for (let i = particles.length - 1; i >= 0; i--) {
     particles[i].update();
@@ -98,8 +102,10 @@ function playerBorders() {
 }
 
 function displaySquare() {
-  fill(player.color);
-  rect(player.x, player.y, player.width, player.height);
+  playerAvatar = createshape("rect", player.x, player.y, player.width, player.height);
+  playerAvatar.color = player.color;
+  // fill(player.color);
+  // rect(player.x, player.y, player.width, player.height);
 }
 
 function move() {
@@ -119,8 +125,9 @@ function move() {
 
   // A Key - Move left
   if (keyIsDown(65) && player.x - player.nonStretchedSize/2 > 0) { 
-    player.x -= player.dx;
+    playerAvatar.xpos -= player.dx;
     isMoving = true;
+    player.moved = true;
 
     if (keyIsDown(87) || keyIsDown(83)) {
       player.width = player.nonStretchedSize;
@@ -134,6 +141,10 @@ function move() {
 
   // D Key - Move right
   if (keyIsDown(68) && player.x + player.nonStretchedSize/2 < width) {
+    player.x += player.dx;
+    isMoving = true;
+    player.moved = true;
+
     if (keyIsDown(87) || keyIsDown(83)) {
       player.width = player.nonStretchedSize;
       player.height = player.nonStretchedSize;
@@ -142,15 +153,13 @@ function move() {
       player.width = player.stretchedMax;
       player.height = player.stretchedMin;
     }
-
-    player.x += player.dx;
-    isMoving = true;
   }
 
   // W Key - Move up
   if (keyIsDown(87) && player.y - player.nonStretchedSize/2 > 0) {
     player.y -= player.dy;
     isMoving = true;
+    player.moved = true;
 
     if (keyIsDown(68) || keyIsDown(65)) {
       player.width = player.nonStretchedSize;
@@ -166,6 +175,7 @@ function move() {
   if (keyIsDown(83) && player.y + player.nonStretchedSize/2 < height) {
     player.y += player.dy;
     isMoving = true;
+    player.moved = true;
 
     if (keyIsDown(68) || keyIsDown(65)) {
       player.width = player.nonStretchedSize;
@@ -177,9 +187,14 @@ function move() {
     }
   }
 
-  if (!isMoving) {
-    player.width = player.nonStretchedSize;
-    player.height = player.nonStretchedSize;
+  if (!isMoving && player.moved) {
+    player.width = player.stretchedMax;
+    player.height = player.stretchedMax;
+    setTimeout(() => {
+      player.width = player.nonStretchedSize;
+      player.height = player.nonStretchedSize;
+    }, 50);
+    player.moved = false;
   }
 
   player.dx = 5;
