@@ -64,7 +64,7 @@ function draw() {
 function showParticles() {
   if (millis() - lastSpawnTime > spawnInterval) {
     particles.push(new Particle(player.x, player.y));
-    lastSpawnTime = millis(); 
+    lastSpawnTime = millis();
   }
   
   // Update and display all particles
