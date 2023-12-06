@@ -3,22 +3,24 @@
 // Nov 21, 2023
 
 class Particle {
-  constructor(x, y) {
+  constructor(x, y, alpha, size) {
     this.x = x;
     this.y = y;
     this.dx = random(-0.5, 0.5);
     this.dy = random(-0.5, 0.5);
-    this.alpha = 255;
+    this.initialAlpha = alpha;
+    this.alpha = alpha;
     this.timer = 1500; 
-    this.size = 10;
+    this.initialSize = size;
+    this.size = size;
   }
 
   update() {
     this.x += this.dx;
     this.y += this.dy;
-    this.timer -= 20;
-    this.alpha = map(this.timer, 1500, 0, 255, 0);
-    this.size = map(this.timer, 1500, 0, 10, 0);
+    this.timer -= 15;
+    this.alpha = map(this.timer, 1500, 0, this.initialAlpha, 0);
+    this.size = map(this.timer, 1500, 0, this.initialSize, 0);
   }
 
   display() {
@@ -74,7 +76,7 @@ function draw() {
   }
   rect(100, 100, 50);
   showParticles();
-  displayPlayer();
+  displayPlayerAndLives();
   playerBorders();
   lives();
   move();
@@ -82,7 +84,7 @@ function draw() {
 
 function showParticles() {
   if (millis() - lastSpawnTime > spawnInterval) {
-    particles.push(new Particle(player.x, player.y));
+    particles.push(new Particle(player.x, player.y, 255, 10));
     lastSpawnTime = millis();
   }
   // Update and display all particles
@@ -115,16 +117,17 @@ function playerBorders() {
   }
 }
 
-function displayPlayer() {
+function displayPlayerAndLives() {
   noStroke();
   fill(player.color);
   rect(player.x, player.y, player.width, player.height);
-  fill("green");
-  textAlign(CENTER);
+  textAlign(CORNER);
   stroke(5);
-  textFont("Courier New", 20);
+  textFont("Courier New", 75);
   textStyle(BOLD);
-  text(player.lives, player.x, player.y, 20, 20);
+  text("❤︎", 10, 65);
+  textFont("Courier New", 35);
+  text(player.lives, 35, 50);
 }
 
 function lives() {
@@ -151,7 +154,7 @@ function keyTyped() {
       setTimeout(() => {
         player.dx += 8;
         player.dy += 8;
-        let newParticle = new Particle(player.x + random(-5, 5), player.y + random(-5, 5));      
+        let newParticle = new Particle(player.x, player.y, 255, 10);      
         particles.push(newParticle);
       }, 10 * i);
     }
