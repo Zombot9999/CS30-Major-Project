@@ -22,6 +22,7 @@ class Particle {
   }
 
   display() {
+    noStroke();
     fill(12, 128, 239, this.alpha);
     rect(this.x, this.y, this.size, this.size); 
   }
@@ -32,19 +33,23 @@ let lastSpawnTime = 0;
 let spawnInterval = 100;
 let player;
 let playerAvatar;
+let playerX = 50;
+let playerY = 50;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   noStroke();
   rectMode(CENTER);
-  c = createshape("circle", 200, 200, 100, 100);
-  c.color = "green";
 
   player = {
     x: width/2,
     y: height/2,
     dx: 5,
     dy: 5,
+    lives: 3,
+    hit: false,
+    invincible: false,
+    iFrameTimer: 0,
     dashTimer: 0,
     dashCooldown: 500,
     width: 20,
@@ -56,14 +61,23 @@ function setup() {
     moved: false,
   };
 }
+
 function draw() {
   background(23, 17, 28);
+  if (collideRectRect(player.x-player.width/2, player.y-player.height/2, player.width, player.height, 75, 75, 50, 50)) {
+    fill("red");
+    player.hit = true;
+  }
+  else {
+    fill("green");
+    player.hit = false;
+  }
+  rect(100, 100, 50);
   showParticles();
-  displaySquare();
+  displayPlayer();
   playerBorders();
+  lives();
   move();
-  drawsprites();
-
 }
 
 function showParticles() {
@@ -101,34 +115,61 @@ function playerBorders() {
   }
 }
 
-function displaySquare() {
-  playerAvatar = createshape("rect", player.x, player.y, player.width, player.height);
-  playerAvatar.color = player.color;
-  // fill(player.color);
-  // rect(player.x, player.y, player.width, player.height);
+function displayPlayer() {
+  noStroke();
+  fill(player.color);
+  rect(player.x, player.y, player.width, player.height);
+  fill("green");
+  textAlign(CENTER);
+  stroke(5);
+  textFont("Courier New", 20);
+  textStyle(BOLD);
+  text(player.lives, player.x, player.y, 20, 20);
+}
+
+function lives() {
+  if (player.hit && player.invincible === false) {
+    player.lives -= 1;
+    player.invincible = true;
+    player.iFrameTimer = millis() + 3000;
+  }
+  if (millis() > player.iFrameTimer) {
+    player.invincible = false;
+  }
+}
+
+function keyTyped() {
+  // Space Bar - Dash
+  if (key === " " && millis() > player.dashTimer) {
+    // Give the player invincibility 
+    if (player.invincible === false) {
+      player.iFrameTimer = millis() + 200;
+      player.invincible = true;
+    }
+
+    for (let i = 0; i <= 15; i++) {
+      setTimeout(() => {
+        player.dx += 8;
+        player.dy += 8;
+        let newParticle = new Particle(player.x + random(-5, 5), player.y + random(-5, 5));      
+        particles.push(newParticle);
+      }, 10 * i);
+    }
+
+    player.dashTimer = millis() + player.dashCooldown;
+  }
 }
 
 function move() {
   let isMoving = false;
 
-  if (keyIsDown(32) && millis() > player.dashTimer) {
-    for (let i = 0; i <= 15; i++) {
-      setTimeout(() => {
-        player.dx += 6;
-        player.dy += 6;
-        let newParticle = new Particle(player.x + random(-5, 5), player.y + random(-5, 5));      
-        particles.push(newParticle);
-      }, 10 * i);
-    }
-    player.dashTimer = millis() + player.dashCooldown;
-  }
-
   // A Key - Move left
   if (keyIsDown(65) && player.x - player.nonStretchedSize/2 > 0) { 
-    playerAvatar.xpos -= player.dx;
+    player.x -= player.dx;
     isMoving = true;
     player.moved = true;
 
+    // Don't stretch if the player is going sideways
     if (keyIsDown(87) || keyIsDown(83)) {
       player.width = player.nonStretchedSize;
       player.height = player.nonStretchedSize;
