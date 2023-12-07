@@ -37,11 +37,17 @@ let player;
 let playerAvatar;
 let playerX = 50;
 let playerY = 50;
+let hourglass;
+
+function preload() {
+  hourglass = loadImage("hourglass.png");
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   noStroke();
   rectMode(CENTER);
+  imageMode(CENTER);
 
   player = {
     x: width/2,
@@ -121,13 +127,18 @@ function displayPlayerAndLives() {
   noStroke();
   fill(player.color);
   rect(player.x, player.y, player.width, player.height);
+  if (player.lives <= 1) {
+    fill("red");
+  }
+  else if (player.x - player.nonStretchedSize <= 50 && player.y - player.nonStretchedSize <= 40) {
+    fill(255, 254, 255);
+  }
   textAlign(CORNER);
   stroke(5);
-  textFont("Courier New", 75);
+  textFont("Courier New", 30);
+  text("❤︎", 10, 30);
   textStyle(BOLD);
-  text("❤︎", 10, 65);
-  textFont("Courier New", 35);
-  text(player.lives, 35, 50);
+  text(player.lives, 45, 28);
 }
 
 function lives() {
@@ -135,6 +146,9 @@ function lives() {
     player.lives -= 1;
     player.invincible = true;
     player.iFrameTimer = millis() + 3000;
+  }
+  if (player.invincible) {
+    image(hourglass, player.x, player.y - player.nonStretchedSize - 5, player.stretchedMin, player.stretchedMin);
   }
   if (millis() > player.iFrameTimer) {
     player.invincible = false;
