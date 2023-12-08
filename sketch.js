@@ -40,7 +40,7 @@ let playerY = 50;
 let hourglass;
 
 function preload() {
-  hourglass = loadImage("hourglass.png");
+  hourglass = loadImage("assets/hourglass.png");
 }
 
 function setup() {
@@ -50,6 +50,7 @@ function setup() {
   imageMode(CENTER);
 
   player = {
+    shape: new Sprite(),
     x: width/2,
     y: height/2,
     dx: 5,
@@ -71,6 +72,7 @@ function setup() {
 }
 
 function draw() {
+  clear();
   background(23, 17, 28);
   if (collideRectRect(player.x-player.width/2, player.y-player.height/2, player.width, player.height, 75, 75, 50, 50)) {
     fill("red");
@@ -125,15 +127,21 @@ function playerBorders() {
 
 function displayPlayerAndLives() {
   noStroke();
+  player.shape.width = player.width;
+  player.shape.height = player.height;
+  player.shape.x = player.x;
+  player.shape.y = player.y;
+  player.shape.color = player.color;
+  player.shape.stroke = player.color;
+
   fill(player.color);
-  rect(player.x, player.y, player.width, player.height);
   if (player.lives <= 1) {
     fill("red");
   }
   else if (player.x - player.nonStretchedSize <= 50 && player.y - player.nonStretchedSize <= 40) {
     fill(255, 254, 255);
   }
-  textAlign(CORNER);
+  textAlign(LEFT);
   stroke(5);
   textFont("Courier New", 30);
   text("❤︎", 10, 30);
