@@ -38,6 +38,7 @@ let playerAvatar;
 let playerX = 50;
 let playerY = 50;
 let hourglass;
+let death;
 
 function preload() {
   hourglass = loadImage("assets/hourglass.png");
@@ -50,7 +51,7 @@ function setup() {
   imageMode(CENTER);
 
   player = {
-    shape: new Sprite(),
+    // shape: new Sprite(),
     x: width/2,
     y: height/2,
     dx: 5,
@@ -69,25 +70,33 @@ function setup() {
     color: color(0, 254, 255),
     moved: false,
   };
+
+  playerAvatar = new Sprite();
+  playerAvatar.collider = "dynamic";
+  death = new Sprite(300, 200);
+  death.collider = "static";
 }
 
 function draw() {
   clear();
   background(23, 17, 28);
-  if (collideRectRect(player.x-player.width/2, player.y-player.height/2, player.width, player.height, 75, 75, 50, 50)) {
-    fill("red");
-    player.hit = true;
-  }
-  else {
-    fill("green");
-    player.hit = false;
-  }
-  rect(100, 100, 50);
-  showParticles();
   displayPlayerAndLives();
+  checkCollision();
+  showParticles();
   playerBorders();
   lives();
   move();
+}
+
+function checkCollision() {
+  if (death.collided(playerAvatar) === true) {
+    death.color = "red";
+    player.hit = true;
+  }
+  else {
+    death.color = "green";
+    player.hit = false;
+  }
 }
 
 function showParticles() {
@@ -127,12 +136,18 @@ function playerBorders() {
 
 function displayPlayerAndLives() {
   noStroke();
-  player.shape.width = player.width;
-  player.shape.height = player.height;
-  player.shape.x = player.x;
-  player.shape.y = player.y;
-  player.shape.color = player.color;
-  player.shape.stroke = player.color;
+  // player.shape.width = player.width;
+  // player.shape.height = player.height;
+  // player.shape.x = player.x;
+  // player.shape.y = player.y;
+  // player.shape.color = player.color;
+  // player.shape.stroke = player.color;
+  playerAvatar.width = player.width;
+  playerAvatar.height = player.height;
+  playerAvatar.x = player.x;
+  playerAvatar.y = player.y;
+  playerAvatar.color = player.color;
+  playerAvatar.stroke = player.color;
 
   fill(player.color);
   if (player.lives <= 1) {
