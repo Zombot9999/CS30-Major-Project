@@ -14,7 +14,7 @@ class Particle {
     this.initialSize = size;
     this.size = size;
   }
-
+  
   update() {
     this.x += this.dx;
     this.y += this.dy;
@@ -22,7 +22,7 @@ class Particle {
     this.alpha = map(this.timer, 1500, 0, this.initialAlpha, 0);
     this.size = map(this.timer, 1500, 0, this.initialSize, 0);
   }
-
+  
   display() {
     noStroke();
     fill(12, 128, 239, this.alpha);
@@ -64,16 +64,17 @@ function setup() {
   noStroke();
   rectMode(CENTER);
   imageMode(CENTER);
-
+  
   playButton = new Clickable();
-
+  
   playButtonVariables = {
     width: 250,
     height: 100,
     x: width/2 - 125,
     y: height/1.5 - 50,
+    textSize: 55,
   };
-
+  
   player = {
     // shape: new Sprite(),
     x: width/2,
@@ -94,11 +95,19 @@ function setup() {
     color: color(0, 254, 255),
     moved: false,
   };
-
+  
   // playerAvatar = new Sprite();
   // playerAvatar.collider = "dynamic";
   // death = new Sprite(300, 200);
   // death.collider = "static";
+  playButton.color = "#FC1F66";      
+  playButton.cornerRadius = 10;       
+  playButton.strokeWeight = 10;       
+  playButton.stroke = "#e2457a";    
+  playButton.text = "PLAY";      
+  playButton.textColor = "white";   
+  playButton.textSize = playButtonVariables.textSize;         
+  playButton.textFont = "times-new-roman"; 
 }
 
 function draw() {
@@ -120,31 +129,41 @@ function draw() {
 
 function displayPlayButton() {
   rectMode(CORNER);
+  playButton.textSize = playButtonVariables.textSize;
   playButton.locate(playButtonVariables.x, playButtonVariables.y);
   playButton.resize(playButtonVariables.width, playButtonVariables.height);
-  playButton.color = "#FC1F66";      
-  playButton.cornerRadius = 10;       
-  playButton.strokeWeight = 10;       
-  playButton.stroke = "#e2457a";    
-  playButton.text = "PLAY";      
-  playButton.textColor = "white";   
-  playButton.textSize = 50;         
-  playButton.textFont = "times-new-roman"; 
-  playButton.textScaled = true;       
   playButton.draw();
 
   playButton.onHover = function(){
-    playButtonVariables.width = 270;
-    playButtonVariables.height = 120;
-    playButtonVariables.x = width/2 - playButtonVariables.width/2;
-    playButtonVariables.y = height/1.5 - playButtonVariables.height/2;
+    if (playButtonVariables.width === 250 && playButtonVariables.height === 100) {
+      playButton.stroke = "#FC1F66";    
+      playButton.color = "#e2457a";      
+      for (let i = 0; i < 4; i++) {
+        setTimeout(() => {
+          playButtonVariables.width += 5;
+          playButtonVariables.height += 5;
+          playButtonVariables.x = width/2 - playButtonVariables.width/2;
+          playButtonVariables.y = height/1.5 - playButtonVariables.height/2;
+          playButtonVariables.textSize += 3;
+        }, 10 * i);
+      }
+    }
   };
 
   playButton.onOutside = function(){
-    playButtonVariables.width = 250;
-    playButtonVariables.height = 100;
-    playButtonVariables.x = width/2 - playButtonVariables.width/2;
-    playButtonVariables.y = height/1.5 - playButtonVariables.height/2;
+    if (playButtonVariables.width === 270 && playButtonVariables.height === 120) {
+      playButton.stroke = "#e2457a";    
+      playButton.color = "#FC1F66";      
+      for (let i = 0; i < 4; i++) {
+        setTimeout(() => {
+          playButtonVariables.width -= 5;
+          playButtonVariables.height -= 5;
+          playButtonVariables.x = width/2 - playButtonVariables.width/2;
+          playButtonVariables.y = height/1.5 - playButtonVariables.height/2;
+          playButtonVariables.textSize -= 3;
+        }, 10 * i);
+      }
+    }
   };
 
   playButton.onPress = function(){
@@ -155,7 +174,7 @@ function displayPlayButton() {
 
 function displayLogoAndMusic() {
   // Play the menu music in a loop
-  if (menuMusic.isPlaying() === false) {
+  if (menuMusic.isPlaying() === false && mouseIsPressed) {
     menuMusic.play();
   }
 
@@ -186,7 +205,9 @@ function displayLogoAndMusic() {
   text("RE-MADE", width/2, height/5 + gameLogo.yValue + gameLogo.height/2.5);
 }
 function checkCollision() {
-  if (collideRectRect(player.x - player.width/2, player.y - player.height/2, player.width, player.height, width/4 - 50, height/4 - 50, 100, 100)) {
+  rectMode(CORNER);
+  if (collideRectRect(player.x - player.width/2, player.y - player.height/2, player.width, player.height, width/4, height/4, 100, 100)) {
+  // if (collideRectRect(player.x - player.width/2, player.y - player.height/2, player.width, player.height, width/4 - 50, height/4 - 50, 100, 100)) {
     fill("red");
     player.hit = true;
   }
@@ -195,6 +216,7 @@ function checkCollision() {
     player.hit = false;
   }
   rect (width/4, height/4, 100, 100);
+  rectMode(CENTER);
 }
 
 function showParticles() {
@@ -273,6 +295,7 @@ function lives() {
 
 function keyTyped() {
   // Space Bar - Dash
+  console.log("running");
   if (state === "level" && key === " " && millis() > player.dashTimer) {
     // Give the player invincibility 
     if (player.invincible === false) {
