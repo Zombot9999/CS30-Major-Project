@@ -2,6 +2,19 @@
 // Tareen Perera
 // Nov 21, 2023
 
+class Squares {
+  constructor(x, y, width, height, dx, dy, warningFrames, displayFrames) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.dx = dx;
+    this.dy = dy;
+    this.warningTime = warningFrames;
+    this.displayTime = displayFrames;
+  }
+}
+
 class Particle {
   constructor(x, y, alpha, size) {
     this.x = x;
@@ -15,6 +28,7 @@ class Particle {
     this.size = size;
   }
   
+  // Move the particle and make it disappear
   update() {
     this.x += this.dx;
     this.y += this.dy;
@@ -23,6 +37,7 @@ class Particle {
     this.size = map(this.timer, 1500, 0, this.initialSize, 0);
   }
   
+  // Display the particle
   display() {
     noStroke();
     fill(12, 128, 239, this.alpha);
@@ -30,6 +45,7 @@ class Particle {
   }
 }
 
+// Variables
 let state = "startup";
 let particles = [];
 let lastSpawnTime = 0;
@@ -44,9 +60,9 @@ let playButton;
 let playButtonVariables;
 let startupAlpha = 255;
 let menuBackground;
-// let playerAvatar;
-// let death;
+let levelTransition = false;
 
+// Load all assets
 function preload() {
   hourglass = loadImage("assets/hourglass.png");
   gameLogo = {
@@ -63,6 +79,7 @@ function preload() {
   menuMusic.setVolume(0.1);
 }
 
+// Setup the variables and modes
 function setup() {
   createCanvas(windowWidth, windowHeight);
   noStroke();
@@ -88,7 +105,6 @@ function setup() {
   };
   
   player = {
-    // shape: new Sprite(),
     x: width/2,
     y: height/2,
     dx: 5,
@@ -108,10 +124,6 @@ function setup() {
     moved: false,
   };
   
-  // playerAvatar = new Sprite();
-  // playerAvatar.collider = "dynamic";
-  // death = new Sprite(300, 200);
-  // death.collider = "static";
   playButton.color = "#FC1F66";      
   playButton.cornerRadius = 10;       
   playButton.strokeWeight = 10;       
@@ -123,10 +135,13 @@ function setup() {
 }
 
 function draw() {
+  // If the game state is startup, display the startup menu
   if (state === "startup") {
     background(5, 15, 14);
     startupMenu();
   }
+
+  // If it's menu, display the logo and the play button
   else if (state === "menu") {
     background(5, 15, 14);
     displayBackground();
@@ -135,6 +150,8 @@ function draw() {
     displayLogoAndMusic();
     displayPlayButton();
   }
+
+  // Launch the level once the player clicks play
   else if (state === "level") {
     background(23, 17, 28);
     checkCollision();
@@ -146,6 +163,7 @@ function draw() {
   }
 }
 
+// Circle animation for main menu
 function displayBackground() {
   noStroke();
   angleMode(RADIANS);
@@ -153,7 +171,7 @@ function displayBackground() {
   fill(252, 31, 109, 100);
   polarEllipses(20, 50, 50, menuBackground.distance);
   polarEllipses(1, menuBackground.radius, menuBackground.radius, 0);
-  if (menuBackground.distance < 800) {
+  if (menuBackground.distance < width/2 + menuBackground.radius * 2) {
     menuBackground.distance += menuBackground.circleVelocity;
     menuBackground.circleVelocity += menuBackground.velocityIncrease;
   }
@@ -176,8 +194,8 @@ function displayBackground() {
   setCenter(-width/2, -height/2);
 }
 
+// I had to make this bc the music wouldn't play without player interaction :(
 function startupMenu() {
-  // I had to make this bc the music wouldn't play without player interaction :(
   textAlign(CENTER);
   fill(252, 31, 109, startupAlpha);
   textFont("courier new", gameLogo.remadeTextSize); 
@@ -201,6 +219,7 @@ function startupMenu() {
   }
 }
 
+// Animation for the play button to fly from the bottom
 function showPlayButton() {
   let iterations = height/5;
   if (playButtonVariables.animationFinished === false) {
@@ -216,6 +235,7 @@ function showPlayButton() {
   }
 }
 
+// Display the play button and do it's hover animations
 function displayPlayButton() {
   rectMode(CORNER);
   playButton.textSize = playButtonVariables.textSize;
@@ -256,14 +276,17 @@ function displayPlayButton() {
       }
     };
   
+    // If clicked change the state to level
     playButton.onPress = function(){
       menuMusic.stop();
       state = "level";
       menuBackground.velocityIncrease = 0.1;
+      levelTransition = true;
     };
   }
 }
 
+// Animate the logo to fly from the top
 function showLogo() {
   let iterations = (height/5 + gameLogo.yValue)/1.5;
   if (gameLogo.animationFinished === false) {
@@ -324,7 +347,6 @@ function displayLogoAndMusic() {
 function checkCollision() {
   rectMode(CORNER);
   if (collideRectRect(player.x - player.width/2, player.y - player.height/2, player.width, player.height, width/4, height/4, 100, 100)) {
-  // if (collideRectRect(player.x - player.width/2, player.y - player.height/2, player.width, player.height, width/4 - 50, height/4 - 50, 100, 100)) {
     fill("red");
     player.hit = true;
   }
@@ -372,16 +394,12 @@ function playerBorders() {
 }
 
 function displayPlayerAndLives() {
+  // Display player
   noStroke();
   fill(player.color);
   rect(player.x, player.y, player.width, player.height);
-  // playerAvatar.width = player.width;
-  // playerAvatar.height = player.height;
-  // playerAvatar.x = player.x;
-  // playerAvatar.y = player.y;
-  // playerAvatar.color = player.color;
-  // playerAvatar.stroke = player.color;
 
+  // Display lives
   if (player.lives <= 1) {
     fill("red");
   }
@@ -397,6 +415,7 @@ function displayPlayerAndLives() {
 }
 
 function lives() {
+  // Decrease lives and grant i frames
   if (player.hit && player.invincible === false) {
     player.lives -= 1;
     player.invincible = true;
@@ -410,9 +429,8 @@ function lives() {
   }
 }
 
-function keyTyped() {
+function keyPressed() {
   // Space Bar - Dash
-  console.log("running");
   if (state === "level" && key === " " && millis() > player.dashTimer) {
     // Give the player invincibility 
     if (player.invincible === false) {
