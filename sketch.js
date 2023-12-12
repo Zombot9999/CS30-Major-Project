@@ -30,7 +30,7 @@ class Particle {
   }
 }
 
-let state = "menu";
+let state = "startup";
 let particles = [];
 let lastSpawnTime = 0;
 let spawnInterval = 100;
@@ -42,6 +42,8 @@ let menuMusic;
 let gameLogo;
 let playButton;
 let playButtonVariables;
+let startupAlpha = 255;
+let menuBackground;
 // let playerAvatar;
 // let death;
 
@@ -54,6 +56,8 @@ function preload() {
     shakeMultiplier: 1,
     yValue: 0,
     remadeTextSize: 60,
+    animationFinished: false,
+    animationY: 0,
   };
   menuMusic = loadSound("assets/menu music.mp3");
   menuMusic.setVolume(0.1);
@@ -65,14 +69,22 @@ function setup() {
   rectMode(CENTER);
   imageMode(CENTER);
   
+  menuBackground = {
+    radius: 50,
+    distance: 1,
+    circleVelocity: 0.2,
+    velocityIncrease: 0.1,
+  };
+
   playButton = new Clickable();
   
   playButtonVariables = {
     width: 250,
     height: 100,
     x: width/2 - 125,
-    y: height/1.5 - 50,
+    y: height,
     textSize: 55,
+    animationFinished: false,
   };
   
   player = {
@@ -111,8 +123,15 @@ function setup() {
 }
 
 function draw() {
-  if (state === "menu") {
+  if (state === "startup") {
     background(5, 15, 14);
+    startupMenu();
+  }
+  else if (state === "menu") {
+    background(5, 15, 14);
+    displayBackground();
+    showLogo();
+    showPlayButton();
     displayLogoAndMusic();
     displayPlayButton();
   }
@@ -127,6 +146,76 @@ function draw() {
   }
 }
 
+function displayBackground() {
+  noStroke();
+  angleMode(RADIANS);
+  setCenter(width/2, height/2);
+  fill(252, 31, 109, 100);
+  polarEllipses(20, 50, 50, menuBackground.distance);
+  polarEllipses(1, menuBackground.radius, menuBackground.radius, 0);
+  if (menuBackground.distance < 800) {
+    menuBackground.distance += menuBackground.circleVelocity;
+    menuBackground.circleVelocity += menuBackground.velocityIncrease;
+  }
+  else {
+    menuBackground.circleVelocity = menuBackground.velocityIncrease;
+    menuBackground.distance = 1;
+    for (let i = 0; i < 20; i++) {
+      setTimeout(() => {
+        menuBackground.radius += 0.5;
+      }, 10 * i);
+    }    
+    setTimeout(() => {
+      for (let i = 0; i < 20; i++) {
+        setTimeout(() => {
+          menuBackground.radius -= 0.5;
+        }, 10 * i);
+      } 
+    }, 100);
+  }
+  setCenter(-width/2, -height/2);
+}
+
+function startupMenu() {
+  // I had to make this bc the music wouldn't play without player interaction :(
+  textAlign(CENTER);
+  fill(252, 31, 109, startupAlpha);
+  textFont("courier new", gameLogo.remadeTextSize); 
+  text("Click Anywhere To Start", width/2, height/2);
+  if (mouseIsPressed) {
+    // Delay the menu so the game has enough time to play the animation
+    setTimeout(() => {
+      state = "menu";
+    }, 1000);
+
+    setTimeout(() => {
+      menuBackground.velocityIncrease = 0.5;
+    }, 18000);
+
+    // Disappearing animation for the text
+    for (let i = 100; i > 0; i--) {
+      setTimeout(() => {
+        startupAlpha = map(i, 0, 100, 0, 255);
+      }, 10 * (100 - i));
+    }
+  }
+}
+
+function showPlayButton() {
+  let iterations = height/5;
+  if (playButtonVariables.animationFinished === false) {
+    for (let i = 0; i < iterations; i++) {
+      setTimeout(() => {
+        playButtonVariables.y -= 2;
+      }, 5 * i);
+    }
+    setTimeout(() => {
+      playButtonVariables.animationFinished = true;
+    }, iterations * 5);
+    playButtonVariables.animationFinished = "waiting...";
+  }
+}
+
 function displayPlayButton() {
   rectMode(CORNER);
   playButton.textSize = playButtonVariables.textSize;
@@ -134,76 +223,104 @@ function displayPlayButton() {
   playButton.resize(playButtonVariables.width, playButtonVariables.height);
   playButton.draw();
 
-  playButton.onHover = function(){
-    if (playButtonVariables.width === 250 && playButtonVariables.height === 100) {
-      playButton.stroke = "#FC1F66";    
-      playButton.color = "#e2457a";      
-      for (let i = 0; i < 4; i++) {
-        setTimeout(() => {
-          playButtonVariables.width += 5;
-          playButtonVariables.height += 5;
-          playButtonVariables.x = width/2 - playButtonVariables.width/2;
-          playButtonVariables.y = height/1.5 - playButtonVariables.height/2;
-          playButtonVariables.textSize += 3;
-        }, 10 * i);
+  if (playButtonVariables.animationFinished === true) {
+    playButton.onHover = function(){
+      if (playButtonVariables.width === 250 && playButtonVariables.height === 100) {
+        playButton.stroke = "#FC1F66";    
+        playButton.color = "#e2457a";      
+        for (let i = 0; i < 4; i++) {
+          setTimeout(() => {
+            playButtonVariables.width += 5;
+            playButtonVariables.height += 5;
+            playButtonVariables.x = width/2 - playButtonVariables.width/2;
+            playButtonVariables.y = height/1.5 - playButtonVariables.height/2;
+            playButtonVariables.textSize += 3;
+          }, 10 * i);
+        }
       }
-    }
-  };
-
-  playButton.onOutside = function(){
-    if (playButtonVariables.width === 270 && playButtonVariables.height === 120) {
-      playButton.stroke = "#e2457a";    
-      playButton.color = "#FC1F66";      
-      for (let i = 0; i < 4; i++) {
-        setTimeout(() => {
-          playButtonVariables.width -= 5;
-          playButtonVariables.height -= 5;
-          playButtonVariables.x = width/2 - playButtonVariables.width/2;
-          playButtonVariables.y = height/1.5 - playButtonVariables.height/2;
-          playButtonVariables.textSize -= 3;
-        }, 10 * i);
+    };
+  
+    playButton.onOutside = function(){
+      if (playButtonVariables.width === 270 && playButtonVariables.height === 120) {
+        playButton.stroke = "#e2457a";    
+        playButton.color = "#FC1F66";      
+        for (let i = 0; i < 4; i++) {
+          setTimeout(() => {
+            playButtonVariables.width -= 5;
+            playButtonVariables.height -= 5;
+            playButtonVariables.x = width/2 - playButtonVariables.width/2;
+            playButtonVariables.y = height/1.5 - playButtonVariables.height/2;
+            playButtonVariables.textSize -= 3;
+          }, 10 * i);
+        }
       }
-    }
-  };
+    };
+  
+    playButton.onPress = function(){
+      menuMusic.stop();
+      state = "level";
+      menuBackground.velocityIncrease = 0.1;
+    };
+  }
+}
 
-  playButton.onPress = function(){
-    menuMusic.stop();
-    state = "level";
-  };
+function showLogo() {
+  let iterations = (height/5 + gameLogo.yValue)/1.5;
+  if (gameLogo.animationFinished === false) {
+    for (let i = 0; i < iterations; i++) {
+      setTimeout(() => {
+        gameLogo.animationY += 1.5;
+      }, 5 * i);
+    }
+    setTimeout(() => {
+      gameLogo.animationFinished = true;
+    }, iterations * 5);
+    gameLogo.animationFinished = "waiting...";
+  }
 }
 
 function displayLogoAndMusic() {
   // Play the menu music in a loop
-  if (menuMusic.isPlaying() === false && mouseIsPressed) {
+  if (menuMusic.isPlaying() === false) {
     menuMusic.play();
   }
-
-  // Animation for the logo
-  setTimeout(() => {
-    for (let i = 0; i <= 10; i++) {
-      setTimeout(() => {
-        gameLogo.yValue += 1;
-        gameLogo.height += 1;
-        gameLogo.width += 1;
-        gameLogo.remadeTextSize += 1;
-      }, 10 * i);
-      setTimeout(() => {
-        gameLogo.yValue -= 1;
-        gameLogo.height -= 1;
-        gameLogo.width -= 1;
-        gameLogo.remadeTextSize -= 1;
-      }, 20 * i);
-    }
-  }, 750 * gameLogo.shakeMultiplier);
-  gameLogo.shakeMultiplier++;
-
-  // Display the logo
-  textAlign(CENTER);
-  fill(252, 31, 109);
-  textFont("Georgia", gameLogo.remadeTextSize); 
-  image(gameLogo.visual, width/2, height/5 + gameLogo.yValue, gameLogo.width, gameLogo.height);
-  text("RE-MADE", width/2, height/5 + gameLogo.yValue + gameLogo.height/2.5);
+  
+  if (gameLogo.animationFinished === true) {
+    // Animation for the logo
+    setTimeout(() => {
+      for (let i = 0; i <= 10; i++) {
+        setTimeout(() => {
+          gameLogo.yValue += 1;
+          gameLogo.height += 1;
+          gameLogo.width += 1;
+          gameLogo.remadeTextSize += 1;
+        }, 10 * i);
+        setTimeout(() => {
+          gameLogo.yValue -= 1;
+          gameLogo.height -= 1;
+          gameLogo.width -= 1;
+          gameLogo.remadeTextSize -= 1;
+        }, 20 * i);
+      }
+    }, 750 * gameLogo.shakeMultiplier);
+    gameLogo.shakeMultiplier++;
+    
+    // Display the logo
+    image(gameLogo.visual, width/2, height/5 + gameLogo.yValue, gameLogo.width, gameLogo.height);
+    textAlign(CENTER);
+    fill(0, 254, 255);
+    textFont("Georgia", gameLogo.remadeTextSize); 
+    text("RE-MADE", width/2, height/5 + gameLogo.yValue + gameLogo.height/2.5);
+  }
+  else {
+    textAlign(CENTER);
+    fill(0, 254, 255, 255);
+    textFont("Georgia", gameLogo.remadeTextSize); 
+    text("RE-MADE", width/2, gameLogo.animationY + gameLogo.height/2.5);
+    image(gameLogo.visual, width/2, gameLogo.animationY, gameLogo.width, gameLogo.height); 
+  }
 }
+
 function checkCollision() {
   rectMode(CORNER);
   if (collideRectRect(player.x - player.width/2, player.y - player.height/2, player.width, player.height, width/4, height/4, 100, 100)) {
