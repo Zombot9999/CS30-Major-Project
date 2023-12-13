@@ -60,11 +60,12 @@ let playButton;
 let playButtonVariables;
 let startupAlpha = 255;
 let menuBackground;
-let levelTransition = false;
+let menuTransition;
 
 // Load all assets
 function preload() {
   hourglass = loadImage("assets/hourglass.png");
+  
   gameLogo = {
     visual: loadImage("assets/logo.png"),
     width: 500,
@@ -75,6 +76,16 @@ function preload() {
     animationFinished: false,
     animationY: 0,
   };
+
+  menuTransition = {
+    transitionSound: loadSound("assets/menu transition.mp3"),
+    levelTransition: false,
+    rectHeight: 0,
+    transitionTime: 1000,
+  };
+
+  menuTransition.transitionSound.setVolume(0.5);
+
   menuMusic = loadSound("assets/menu music.mp3");
   menuMusic.setVolume(0.1);
 }
@@ -91,6 +102,7 @@ function setup() {
     distance: 1,
     circleVelocity: 0.2,
     velocityIncrease: 0.1,
+    circleCount: 20,
   };
 
   playButton = new Clickable();
@@ -149,6 +161,7 @@ function draw() {
     showPlayButton();
     displayLogoAndMusic();
     displayPlayButton();
+    transition();
   }
 
   // Launch the level once the player clicks play
@@ -160,6 +173,27 @@ function draw() {
     displayPlayerAndLives();
     lives();
     move();
+    transition();
+  }
+}
+
+function transition() {
+  rectMode(CENTER);
+  fill(27, 17, 28);
+  noStroke();
+  rect(width/2, height/2, width, menuTransition.rectHeight);
+  if (menuTransition.levelTransition === true) {
+    for (let i = 0; i <= 200; i++) {
+      setTimeout(() => {
+        menuTransition.rectHeight = map(i, 0, 200, 0, height);
+      }, 5 * i);
+    }
+    for (let i = 200; i >= 0; i--) {
+      setTimeout(() => {
+        menuTransition.rectHeight = map(i, 0, 200, 0, height);
+      }, 5 * (200 - i) + 1000);
+    }
+    menuTransition.levelTransition = "waiting...";
   }
 }
 
@@ -169,7 +203,7 @@ function displayBackground() {
   angleMode(RADIANS);
   setCenter(width/2, height/2);
   fill(252, 31, 109, 100);
-  polarEllipses(20, 50, 50, menuBackground.distance);
+  polarEllipses(menuBackground.circleCount, 50, 50, menuBackground.distance);
   polarEllipses(1, menuBackground.radius, menuBackground.radius, 0);
   if (menuBackground.distance < width/2 + menuBackground.radius * 2) {
     menuBackground.distance += menuBackground.circleVelocity;
@@ -208,6 +242,7 @@ function startupMenu() {
 
     setTimeout(() => {
       menuBackground.velocityIncrease = 0.5;
+      menuBackground.circleCount = 30;
     }, 18000);
 
     // Disappearing animation for the text
@@ -277,12 +312,17 @@ function displayPlayButton() {
     };
   
     // If clicked change the state to level
-    playButton.onPress = function(){
-      menuMusic.stop();
-      state = "level";
-      menuBackground.velocityIncrease = 0.1;
-      levelTransition = true;
-    };
+    if (menuTransition.levelTransition === false) {
+      playButton.onPress = function(){
+        setTimeout(() => {
+          state = "level";
+          menuBackground.velocityIncrease = 0.1;
+        }, menuTransition.transitionTime);
+        menuTransition.levelTransition = true;
+        menuMusic.stop();
+        menuTransition.transitionSound.play();
+      };
+    }
   }
 }
 
@@ -304,7 +344,7 @@ function showLogo() {
 
 function displayLogoAndMusic() {
   // Play the menu music in a loop
-  if (menuMusic.isPlaying() === false) {
+  if (menuMusic.isPlaying() === false && menuTransition.levelTransition === false) {
     menuMusic.play();
   }
   
