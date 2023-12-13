@@ -3,15 +3,32 @@
 // Nov 21, 2023
 
 class Squares {
-  constructor(x, y, width, height, dx, dy, warningFrames, displayFrames) {
+  constructor(x, y, width, height, dx, dy, warningFrames, displayFrames, rectModeVariable) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     this.dx = dx;
     this.dy = dy;
+    this.warningStart = millis();
     this.warningTime = warningFrames;
     this.displayTime = displayFrames;
+    this.rectModeVariable = rectModeVariable;
+  }
+
+  display() {
+    rectMode(this.rectModeVariable);
+    noStroke();
+    if (this.warningStart + this.warningTime < millis()) {
+      fill(252, 31, 109);
+    }
+    else {
+      fill(86, 26, 60);
+    }
+    if (player.hit === true) {
+      fill("red");
+    }
+    rect(this.x, this.y, this.width, this.height);
   }
 }
 
@@ -61,6 +78,8 @@ let playButtonVariables;
 let startupAlpha = 255;
 let menuBackground;
 let menuTransition;
+let playADramaticIrony = true;
+let squaresArray = [];
 
 // Load all assets
 function preload() {
@@ -168,13 +187,42 @@ function draw() {
   else if (state === "level") {
     background(23, 17, 28);
     checkCollision();
+    showSquares();
     showParticles();
     playerBorders();
-    displayPlayerAndLives();
     lives();
-    move();
+    aDramaticIrony();
+    rectMode(CENTER);
+    displayPlayerAndLives();
     transition();
+    move();
+    rectMode(CORNER);
   }
+}
+
+function aDramaticIrony() {
+  if (playADramaticIrony === true) {
+    let square = new Squares(width/4, height/4, 100, 100, 0, 0, 3000, 50000, CORNER);
+    squaresArray.push(square);
+    let square2 = new Squares(0, height - height/10, 100, 100, 0, 0, 1500, 50000, CORNER);
+    squaresArray.push(square2);
+    playADramaticIrony = false;
+  }
+}
+
+function showSquares() {
+  for (let i = 0; i < squaresArray.length; i++) {
+    squaresArray[i].display();
+  }
+}
+
+function checkCollision() {
+  rectMode(CORNER);
+  for (let i = 0; i < squaresArray.length; i++) {
+    player.hit = collideRectRect(player.x - player.width/2, player.y - player.height/2, player.width, player.height, squaresArray[i].x, squaresArray[i].y, squaresArray[i].width, squaresArray[i].height);
+    console.log(player.hit);
+  }
+  rectMode(CENTER);
 }
 
 function transition() {
@@ -384,19 +432,7 @@ function displayLogoAndMusic() {
   }
 }
 
-function checkCollision() {
-  rectMode(CORNER);
-  if (collideRectRect(player.x - player.width/2, player.y - player.height/2, player.width, player.height, width/4, height/4, 100, 100)) {
-    fill("red");
-    player.hit = true;
-  }
-  else {
-    fill(252, 31, 109);
-    player.hit = false;
-  }
-  rect (width/4, height/4, 100, 100);
-  rectMode(CENTER);
-}
+
 
 function showParticles() {
   if (millis() - lastSpawnTime > spawnInterval) {
