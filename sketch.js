@@ -120,8 +120,9 @@ function setup() {
     radius: 50,
     distance: 1,
     circleVelocity: 0.2,
-    velocityIncrease: 0.1,
+    velocityIncrease: 0.05,
     circleCount: 20,
+    angle: 0,
   };
 
   playButton = new Clickable();
@@ -248,12 +249,14 @@ function transition() {
 // Circle animation for main menu
 function displayBackground() {
   noStroke();
+  push();
   angleMode(RADIANS);
   setCenter(width/2, height/2);
+  rotate(menuBackground.angle);
   fill(252, 31, 109, 100);
   polarEllipses(menuBackground.circleCount, 50, 50, menuBackground.distance);
   polarEllipses(1, menuBackground.radius, menuBackground.radius, 0);
-  if (menuBackground.distance < width/2 + menuBackground.radius * 2) {
+  if (menuBackground.distance < width/2 + menuBackground.radius * 5) {
     menuBackground.distance += menuBackground.circleVelocity;
     menuBackground.circleVelocity += menuBackground.velocityIncrease;
   }
@@ -274,6 +277,8 @@ function displayBackground() {
     }, 100);
   }
   setCenter(-width/2, -height/2);
+  menuBackground.angle += 1;
+  pop();
 }
 
 // I had to make this bc the music wouldn't play without player interaction :(
@@ -289,7 +294,7 @@ function startupMenu() {
     }, 1000);
 
     setTimeout(() => {
-      menuBackground.velocityIncrease = 0.5;
+      menuBackground.velocityIncrease = 0.25;
       menuBackground.circleCount = 30;
     }, 18000);
 
