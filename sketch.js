@@ -12,23 +12,45 @@ class Squares {
     this.dy = dy;
     this.warningStart = millis();
     this.warningTime = warningFrames;
+    this.displayStart = millis() + warningFrames;
     this.displayTime = displayFrames;
     this.rectModeVariable = rectModeVariable;
+    this.alpha = 0;
+    this.spawnColor = true;
   }
 
   display() {
     rectMode(this.rectModeVariable);
     noStroke();
     if (this.warningStart + this.warningTime < millis()) {
-      fill(252, 31, 109);
+      if (this.spawnColor) {
+        setTimeout(() => {
+          this.spawnColor = false;
+        }, 200);
+        fill("white");
+      }
+      else if (this.spawnColor === false) {
+        fill(252, 31, 109);
+      }
     }
     else {
-      fill(86, 26, 60);
+      // fill(86, 26, 60);
+      fill(252, 31, 109, this.alpha);
     }
-    if (player.hit === true) {
-      fill("red");
-    }
+    // if (player.hit === true) {
+    //   fill("red");
+    // }
     rect(this.x, this.y, this.width, this.height);
+  }
+
+  update() {
+    if (this.warningStart + this.warningTime > millis()) {
+      this.alpha += 1;
+    }
+    else if (this.warningStart + this.warningTime < millis()) {
+      this.x += this.dx;
+      this.y += this.dy;
+    }
   }
 }
 
@@ -203,25 +225,48 @@ function draw() {
 
 function aDramaticIrony() {
   if (playADramaticIrony === true) {
-    let square = new Squares(width/4, height/4, 100, 100, 0, 0, 3000, 50000, CORNER);
-    squaresArray.push(square);
-    let square2 = new Squares(0, height - height/10, 100, 100, 0, 0, 1500, 50000, CORNER);
-    squaresArray.push(square2);
+    setTimeout(() => {
+      let square = new Squares(width/4, height/4, 100, 100, 0, 0, 3000, 5000, CORNER);
+      squaresArray.push(square);
+      square = new Squares(0, width/2, 50, height, -5, 0, 1500, 10000, CORNER);
+      squaresArray.push(square);
+      square = new Squares(0, 0, 20, height, 5, 0, 1000, 10000, CORNER);
+      squaresArray.push(square);
+      // for (let i = 0; i < 5; i++) {
+      //   setTimeout(() => {
+      //     square = new Squares(random(0, width), random(0, height), 50, height, 0, 0, 2500, 2000, CORNER);
+      //     squaresArray.push(square);
+      //   }, 500 * i);
+      // }
+    }, 1000);
     playADramaticIrony = false;
   }
 }
 
 function showSquares() {
-  for (let i = 0; i < squaresArray.length; i++) {
+  for (let i = squaresArray.length - 1; i >= 0; i--) {
     squaresArray[i].display();
+    squaresArray[i].update();
+    if (millis() > squaresArray[i].displayStart + squaresArray[i].displayTime) {
+      squaresArray.splice(i, 1);
+    }
   }
 }
 
 function checkCollision() {
   rectMode(CORNER);
+  let hits = 0;
   for (let i = 0; i < squaresArray.length; i++) {
-    player.hit = collideRectRect(player.x - player.width/2, player.y - player.height/2, player.width, player.height, squaresArray[i].x, squaresArray[i].y, squaresArray[i].width, squaresArray[i].height);
+    if (collideRectRect(player.x - player.width/2, player.y - player.height/2, player.width, player.height, squaresArray[i].x, squaresArray[i].y, squaresArray[i].width, squaresArray[i].height) && squaresArray[i].warningStart + squaresArray[i].warningTime < millis()) {
+      hits += 1;
+    }
     console.log(player.hit);
+  }
+  if (hits > 0) {
+    player.hit = true;
+  }
+  else {
+    player.hit = false;
   }
   rectMode(CENTER);
 }
