@@ -3,56 +3,129 @@
 // Nov 21, 2023
 
 class Squares {
-  constructor(x, y, width, height, dx, dy, warningFrames, displayFrames, rectModeVariable) {
+  constructor(x, y, width, height, dx, dy, warningFrames, displayFrames, rectModeVariable, timeout) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     this.dx = dx;
     this.dy = dy;
-    this.warningStart = millis();
+    this.warningStart = millis() + timeout;
     this.warningTime = warningFrames;
-    this.displayStart = millis() + this.warningTime;
+    this.displayStart = millis() + this.warningTime + timeout;
     this.displayTime = displayFrames;
     this.rectModeVariable = rectModeVariable;
     this.alpha = 0;
     this.spawnColor = true;
+    this.timeoutStart = millis();
+    this.timeout = timeout;
   }
 
   display() {
-    // console.log(floor(this.warningStart + this.warningTime), floor(millis()), this.warningStart + this.warningTime < millis(), millis() + 1000 > this.displayStart + this.displayTime);
-    rectMode(this.rectModeVariable);
-    noStroke();
-    if (this.warningStart + this.warningTime < millis()) {
-      if (this.spawnColor) {
-        setTimeout(() => {
-          this.spawnColor = false;
-        }, 200);
-        fill("white");
-      }
-      else if (this.spawnColor === false && millis() + 100 > this.displayStart + this.displayTime) {
-        fill("white");
+    if (millis() > this.timeoutStart + this.timeout) {
+      rectMode(this.rectModeVariable);
+      noStroke();
+      if (this.warningStart + this.warningTime < millis()) {
+        if (this.spawnColor) {
+          setTimeout(() => {
+            this.spawnColor = false;
+          }, 200);
+          fill("white");
+        }
+        else if (this.spawnColor === false && millis() + 100 > this.displayStart + this.displayTime) {
+          fill("white");
+        }
+        else {
+          fill(252, 31, 109);
+        }
       }
       else {
-        fill(252, 31, 109);
+        fill(252, 31, 109, this.alpha);
       }
+      // if (player.hit === true) {
+      //   fill("red");
+      // }
+      rect(this.x, this.y, this.width, this.height);
     }
-    else {
-      fill(252, 31, 109, this.alpha);
-    }
-    // if (player.hit === true) {
-    //   fill("red");
-    // }
-    rect(this.x, this.y, this.width, this.height);
   }
 
   update() {
-    if (this.warningStart + this.warningTime > millis()) {
-      this.alpha += 1;
+    if (millis() > this.timeoutStart + this.timeout) {
+      if (this.warningStart + this.warningTime > millis()) {
+        this.alpha += 1;
+      }
+      else if (this.warningStart + this.warningTime < millis()) {
+        this.x += this.dx;
+        this.y += this.dy;
+      }
     }
-    else if (this.warningStart + this.warningTime < millis()) {
-      this.x += this.dx;
-      this.y += this.dy;
+  }
+}
+
+class Circles {
+  constructor(x, y, radius, radiusIncrease, dx, dy, velocityX, velocityY, warningFrames, displayFrames, rectModeVariable, timeout) {
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.radiusIncrease = radiusIncrease;
+    this.dx = dx;
+    this.dy = dy;
+    this.vx = velocityX;
+    this.vy = velocityY;
+    this.warningStart = millis() + timeout;
+    this.warningTime = warningFrames;
+    this.displayStart = millis() + this.warningTime + timeout;
+    this.displayTime = displayFrames;
+    this.rectModeVariable = rectModeVariable;
+    this.alpha = 0;
+    this.spawnColor = true;
+    this.timeoutStart = millis();
+    this.timeout = timeout;
+  }
+
+  display() {
+    if (millis() > this.timeoutStart + this.timeout) {
+      rectMode(this.rectModeVariable);
+      noStroke();
+      if (this.warningStart + this.warningTime < millis()) {
+        if (this.spawnColor) {
+          setTimeout(() => {
+            this.spawnColor = false;
+          }, 200);
+          fill("white");
+        }
+        else if (this.spawnColor === false && millis() + 100 > this.displayStart + this.displayTime) {
+          fill("white");
+        }
+        else {
+          fill(252, 31, 109);
+        }
+      }
+      else {
+        fill(252, 31, 109, this.alpha);
+      }
+      if (player.hit === true) {
+        fill("red");
+      }
+      circle(this.x, this.y, this.radius * 2);
+    }
+  }
+
+  update() {
+    if (millis() > this.timeoutStart + this.timeout) {
+      if (this.warningStart + this.warningTime > millis()) {
+        this.alpha += 1;
+      }
+      else if (this.warningStart + this.warningTime < millis()) {
+        this.x += this.dx;
+        this.y += this.dy;
+        this.dx += this.vx;
+        this.dy += this.vy;
+        this.radius += this.radiusIncrease;
+        if (this.radiusIncrease > 0) {
+          this.spawnColor = true;
+        }
+      }
     }
   }
 }
@@ -88,7 +161,7 @@ class Particle {
 }
 
 // Variables
-let state = "startup";
+let state = "level";
 let particles = [];
 let lastSpawnTime = 0;
 let spawnInterval = 100;
@@ -105,6 +178,7 @@ let menuBackground;
 let menuTransition;
 let playADramaticIrony = true;
 let squaresArray = [];
+let circlesArray = [];
 let aDramaticIronyMusic;
 
 // Load all assets
@@ -218,6 +292,7 @@ function draw() {
     background(23, 17, 28);
     checkCollision();
     showSquares();
+    showCircles();
     showParticles();
     playerBorders();
     lives();
@@ -233,26 +308,40 @@ function draw() {
 function aDramaticIrony() {
   if (playADramaticIrony === true) {
     let square;
-    setTimeout(() => {
-      aDramaticIronyMusic.play();
-      square = new Squares(width/4, height/4, 100, 100, 0, 0, 3000, 5000, CORNER);
-      squaresArray.push(square);
-      square = new Squares(width, 0, 50, height, -5, 0, 1500, 6000, CORNER);
-      squaresArray.push(square);
-      square = new Squares(0, 0, 20, height, 5, 0, 1000, 6000, CORNER);
-      squaresArray.push(square);
-      for (let i = 0; i < 5; i++) {
-        setTimeout(() => {
-          square = new Squares(0, random(0, height), width, random(25, 50), 0, 0, 2500, 2000, CORNER);
-          squaresArray.push(square);
-        }, 1000 * i);
-      }
-      for (let i = 0; i < 100; i++) {
-        setTimeout(() => {
-          screenShake(10);
-        }, 1500 * i);
-      }
-    }, 1000);
+    let circle;
+
+    aDramaticIronyMusic.play();
+    // circle = new Circles(width/2, height/2, 30, 0, 0, 0, 0, 0, 3000, 100000, CORNER, 2000);
+    // circlesArray.push(circle);
+    for (let i = 0; i <= 1000; i++) {
+      circle = new Circles(random(width), 0, 1, 0.1, 0, 1, 0, 0.1, 0, 10000, CORNER, 100 * i + 1000);
+      circlesArray.push(circle);
+    }
+
+    // square = new Squares(width/4, height/4, 100, 100, 0, 0, 3000, 3000, CORNER, 1000);
+    // squaresArray.push(square);
+
+    // square = new Squares(width, 0, 50, height, -5, 0, 1500, 6000, CORNER, 0);
+    // squaresArray.push(square);
+
+    // square = new Squares(0, 0, 20, height, 20, 0, 1000, 6000, CORNER, 5000);
+    // squaresArray.push(square);
+    // square = new Squares(0, 0, width, 20, 0, 10, 3000, 6000, CORNER, 7500);
+    // squaresArray.push(square);
+    // square = new Squares(0, height - 20, width, 20, 0, -10, 3000, 6000, CORNER, 10000);
+    // squaresArray.push(square);
+    // square = new Squares(width - 20, 0, 20, height, -20, 0, 3000, 6000, CORNER, 12500);
+    // squaresArray.push(square);
+
+    // for (let i = 0; i < 5; i++) {
+    //   square = new Squares(0, random(0, height), width, random(25, 50), 0, 0, 2500, 2000, CORNER, 1000 * i);
+    //   squaresArray.push(square);
+    // }
+    // for (let i = 0; i < 5; i++) {
+    //   setTimeout(() => {
+    //     screenShake(5);
+    //   }, 1500 * i);
+    // }
     playADramaticIrony = false;
   }
 }
@@ -263,6 +352,16 @@ function showSquares() {
     squaresArray[i].update();
     if (millis() > squaresArray[i].displayStart + squaresArray[i].displayTime) {
       squaresArray.splice(i, 1);
+    }
+  }
+}
+
+function showCircles() {
+  for (let i = circlesArray.length - 1; i >= 0; i--) {
+    circlesArray[i].display();
+    circlesArray[i].update();
+    if (millis() > circlesArray[i].displayStart + circlesArray[i].displayTime) {
+      circlesArray.splice(i, 1);
     }
   }
 }
@@ -291,6 +390,11 @@ function checkCollision() {
   let hits = 0;
   for (let i = 0; i < squaresArray.length; i++) {
     if (collideRectRect(player.x - player.width/2, player.y - player.height/2, player.width, player.height, squaresArray[i].x, squaresArray[i].y, squaresArray[i].width, squaresArray[i].height) && squaresArray[i].warningStart + squaresArray[i].warningTime < millis()) {
+      hits += 1;
+    }
+  }
+  for (let i = 0; i < circlesArray.length; i++) {
+    if (collideRectCircle(player.x - player.width/2, player.y - player.height/2, player.width, player.height, circlesArray[i].x, circlesArray[i].y, circlesArray[i].radius * 2) && circlesArray[i].warningStart + circlesArray[i].warningTime < millis()) {
       hits += 1;
     }
   }
@@ -517,6 +621,7 @@ function displayLogoAndMusic() {
 
 
 function showParticles() {
+  rectMode(CENTER);
   if (millis() - lastSpawnTime > spawnInterval) {
     particles.push(new Particle(player.x, player.y, 255, 10));
     lastSpawnTime = millis();
