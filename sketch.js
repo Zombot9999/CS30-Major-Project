@@ -12,7 +12,7 @@ class Squares {
     this.dy = dy;
     this.warningStart = millis();
     this.warningTime = warningFrames;
-    this.displayStart = millis() + warningFrames;
+    this.displayStart = millis() + this.warningTime;
     this.displayTime = displayFrames;
     this.rectModeVariable = rectModeVariable;
     this.alpha = 0;
@@ -20,6 +20,7 @@ class Squares {
   }
 
   display() {
+    // console.log(floor(this.warningStart + this.warningTime), floor(millis()), this.warningStart + this.warningTime < millis(), millis() + 1000 > this.displayStart + this.displayTime);
     rectMode(this.rectModeVariable);
     noStroke();
     if (this.warningStart + this.warningTime < millis()) {
@@ -29,12 +30,14 @@ class Squares {
         }, 200);
         fill("white");
       }
-      else if (this.spawnColor === false) {
+      else if (this.spawnColor === false && millis() + 100 > this.displayStart + this.displayTime) {
+        fill("white");
+      }
+      else {
         fill(252, 31, 109);
       }
     }
     else {
-      // fill(86, 26, 60);
       fill(252, 31, 109, this.alpha);
     }
     // if (player.hit === true) {
@@ -102,10 +105,14 @@ let menuBackground;
 let menuTransition;
 let playADramaticIrony = true;
 let squaresArray = [];
+let aDramaticIronyMusic;
 
 // Load all assets
 function preload() {
   hourglass = loadImage("assets/hourglass.png");
+  
+  aDramaticIronyMusic = loadSound("assets/a dramatic irony.mp3");
+  aDramaticIronyMusic.setVolume(0.2);
   
   gameLogo = {
     visual: loadImage("assets/logo.png"),
@@ -125,7 +132,7 @@ function preload() {
     transitionTime: 1000,
   };
 
-  menuTransition.transitionSound.setVolume(0.5);
+  menuTransition.transitionSound.setVolume(0.2);
 
   menuMusic = loadSound("assets/menu music.mp3");
   menuMusic.setVolume(0.1);
@@ -225,19 +232,26 @@ function draw() {
 
 function aDramaticIrony() {
   if (playADramaticIrony === true) {
+    let square;
     setTimeout(() => {
-      let square = new Squares(width/4, height/4, 100, 100, 0, 0, 3000, 5000, CORNER);
+      aDramaticIronyMusic.play();
+      square = new Squares(width/4, height/4, 100, 100, 0, 0, 3000, 5000, CORNER);
       squaresArray.push(square);
-      square = new Squares(0, width/2, 50, height, -5, 0, 1500, 10000, CORNER);
+      square = new Squares(width, 0, 50, height, -5, 0, 1500, 6000, CORNER);
       squaresArray.push(square);
-      square = new Squares(0, 0, 20, height, 5, 0, 1000, 10000, CORNER);
+      square = new Squares(0, 0, 20, height, 5, 0, 1000, 6000, CORNER);
       squaresArray.push(square);
-      // for (let i = 0; i < 5; i++) {
-      //   setTimeout(() => {
-      //     square = new Squares(random(0, width), random(0, height), 50, height, 0, 0, 2500, 2000, CORNER);
-      //     squaresArray.push(square);
-      //   }, 500 * i);
-      // }
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          square = new Squares(0, random(0, height), width, random(25, 50), 0, 0, 2500, 2000, CORNER);
+          squaresArray.push(square);
+        }, 1000 * i);
+      }
+      for (let i = 0; i < 100; i++) {
+        setTimeout(() => {
+          screenShake(10);
+        }, 1500 * i);
+      }
     }, 1000);
     playADramaticIrony = false;
   }
@@ -253,6 +267,25 @@ function showSquares() {
   }
 }
 
+function screenShake(loopNo) {
+  for (let i = squaresArray.length - 1; i >= 0; i--) {
+    for (let j = 0; j < loopNo; j++) {
+      setTimeout(() => {
+        squaresArray[i].y += 1;
+        player.y += 0.5;
+      }, 20 * j);
+    }
+    setTimeout(() => {
+      for (let k = 0; k < loopNo; k++) {
+        setTimeout(() => {
+          squaresArray[i].y -= 1;
+          player.y -= 0.5;
+        }, 20 * k);
+      }
+    }, loopNo * 20/2);
+  }
+}
+
 function checkCollision() {
   rectMode(CORNER);
   let hits = 0;
@@ -260,7 +293,6 @@ function checkCollision() {
     if (collideRectRect(player.x - player.width/2, player.y - player.height/2, player.width, player.height, squaresArray[i].x, squaresArray[i].y, squaresArray[i].width, squaresArray[i].height) && squaresArray[i].warningStart + squaresArray[i].warningTime < millis()) {
       hits += 1;
     }
-    console.log(player.hit);
   }
   if (hits > 0) {
     player.hit = true;
