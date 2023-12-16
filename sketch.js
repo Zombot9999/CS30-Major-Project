@@ -33,6 +33,12 @@ class Squares {
           fill("white");
         }
         else if (this.spawnColor === false && millis() + 100 > this.displayStart + this.displayTime) {
+          this.dx = 0;
+          this.dy = 0;
+          this.width -= this.width/4;
+          this.height -= this.height/4;
+          this.x += this.width/8;
+          this.y += this.height/8;
           fill("white");
         }
         else {
@@ -95,7 +101,12 @@ class Circles {
           fill("white");
         }
         else if (this.spawnColor === false && millis() + 100 > this.displayStart + this.displayTime) {
-          fill("white");
+          if (this.radiusIncrease > 0) {
+            this.radius -= this.radiusIncrease * 20;
+          }
+          else {
+            fill("white");
+          }
         }
         else {
           fill(252, 31, 109);
@@ -158,7 +169,7 @@ class Particle {
 }
 
 // Variables
-let state = "startup";
+let state = "level";
 let particles = [];
 let lastSpawnTime = 0;
 let spawnInterval = 100;
@@ -260,6 +271,7 @@ function setup() {
     nonStretchedSize: 20,
     color: color(0, 254, 255),
     moved: false,
+    movement: true,
   };
   
   playButton.color = "#FC1F66";      
@@ -312,40 +324,44 @@ function aDramaticIrony() {
   if (playADramaticIrony === true) {
     let square;
     let circle;
-    aDramaticIronyMusic.play();
 
-    circle = new Circles(width/2, height/2, 30, 1, 0, 0, 0, 0, 3000, 100000, CORNER, 2000);
-    circlesArray.push(circle);
+    setTimeout(() => {
+      aDramaticIronyMusic.play();
+      
+      for (let i = 0; i <= 30; i++) {
+        let size = random([75, 125]);
+        square = new Squares(random(width), random(height), size, size, 0, 0, 750, 2000, CORNER, i * 700);
+        squaresArray.push(square);
+        circle = new Circles(random(width), 0, 5, 0, 0, 1, 0, 0.1, 0, 2000, CORNER, 700 * i);
+        circlesArray.push(circle);
+      }
 
-    for (let i = 0; i <= 1000; i++) {
-      circle = new Circles(random(width), 0, 5, 0, 0, 1, 0, 0.1, 0, 10000, CORNER, 100 * i + 1000);
-      circlesArray.push(circle);
-    }
-
-    // square = new Squares(width/4, height/4, 100, 100, 0, 0, 3000, 3000, CORNER, 1000);
-    // squaresArray.push(square);
-
-    // square = new Squares(width, 0, 50, height, -5, 0, 1500, 6000, CORNER, 0);
-    // squaresArray.push(square);
-
-    // square = new Squares(0, 0, 20, height, 20, 0, 1000, 6000, CORNER, 5000);
-    // squaresArray.push(square);
-    // square = new Squares(0, 0, width, 20, 0, 10, 3000, 6000, CORNER, 7500);
-    // squaresArray.push(square);
-    // square = new Squares(0, height - 20, width, 20, 0, -10, 3000, 6000, CORNER, 10000);
-    // squaresArray.push(square);
-    // square = new Squares(width - 20, 0, 20, height, -20, 0, 3000, 6000, CORNER, 12500);
-    // squaresArray.push(square);
-
-    // for (let i = 0; i < 5; i++) {
-    //   square = new Squares(0, random(0, height), width, random(25, 50), 0, 0, 2500, 2000, CORNER, 1000 * i);
-    //   squaresArray.push(square);
-    // }
-    for (let i = 0; i < 5; i++) {
+      square = new Squares(0, 0, 100, height, 0, 0, 1000, 10000, CORNER, 22000);
+      squaresArray.push(square);
+      square = new Squares(width - 100, 0, 100, height, 0, 0, 1000, 10000, CORNER, 22000);
+      squaresArray.push(square);
+      square = new Squares(0, 0, width, 100, 0, 0, 1000, 10000, CORNER, 22000);
+      squaresArray.push(square);
+      square = new Squares(0, height - 100, width, 100, 0, 0, 1000, 10000, CORNER, 22000);
+      squaresArray.push(square);
       setTimeout(() => {
-        screenShake(5);
-      }, 1500 * i);
-    }
+        screenShake(10);
+      }, 23000);
+
+      square = new Squares(0, 0, 200, height, 0, 0, 1000, 10000, CORNER, 25500);
+      squaresArray.push(square);
+      square = new Squares(width - 200, 0, 200, height, 0, 0, 1000, 10000, CORNER, 25500);
+      squaresArray.push(square);
+      square = new Squares(0, 0, width, 200, 0, 0, 1000, 10000, CORNER, 25500);
+      squaresArray.push(square);
+      square = new Squares(0, height - 200, width, 200, 0, 0, 1000, 10000, CORNER, 25500);
+      squaresArray.push(square);
+      setTimeout(() => {
+        screenShake(10);
+      }, 26500);
+
+    }, 1000);
+
     playADramaticIrony = false;
   }
 }
@@ -719,10 +735,46 @@ function displayPlayerAndLives() {
 function lives() {
   // Decrease lives and grant i frames
   if (player.hit && player.invincible === false) {
+    let wHeld = false;
+    let sHeld = false;
+    let dHeld = false;
+    let aHeld = false;
+    if (keyIsDown(87)) {
+      wHeld = true;
+    }
+    if (keyIsDown(68)) {
+      dHeld = true;
+    }
+    if (keyIsDown(83)) {
+      sHeld = true;
+    }
+    if (keyIsDown(65)) {
+      aHeld = true;
+    }
     player.lives -= 1;
     playerHit.play();
     player.invincible = true;
     player.iFrameTimer = millis() + 3000;
+    player.dx *= -1;
+    player.dy *= -1;
+    for (let i = 0; i <= 50; i++) {
+      setTimeout(() => {
+        player.movement = false;
+        if (dHeld) {
+          player.x -= player.dx;
+        }
+        if (aHeld) {
+          player.x += player.dx;
+        }
+        if (sHeld) {
+          player.y -= player.dy;
+        }
+        if (wHeld) {
+          player.y += player.dx;
+        }
+        player.movement = true;
+      }, 5 * i);
+    }
   }
   if (player.invincible) {
     image(hourglass, player.x, player.y - player.nonStretchedSize - 5, player.stretchedMin, player.stretchedMin);
@@ -730,7 +782,7 @@ function lives() {
   if (millis() > player.iFrameTimer) {
     player.invincible = false;
   }
-  if (player.lives <= 0) {
+  if (player.lives <= -99) {
     playerDead.play();
     aDramaticIronyMusic.stop();
 
@@ -760,7 +812,7 @@ function lives() {
 
 function keyPressed() {
   // Space Bar - Dash
-  if (state === "level" && key === " " && millis() > player.dashTimer) {
+  if (state === "level" && key === " " && millis() > player.dashTimer && player.movement) {
     // Give the player invincibility 
     if (player.invincible === false) {
       player.iFrameTimer = millis() + 200;
@@ -784,81 +836,83 @@ function move() {
   rectMode(CENTER);
   let isMoving = false;
 
-  // A Key - Move left
-  if (keyIsDown(65) && player.x - player.nonStretchedSize/2 > 0) { 
-    player.x -= player.dx;
-    isMoving = true;
-    player.moved = true;
-
-    // Don't stretch if the player is going sideways
-    if (keyIsDown(87) || keyIsDown(83)) {
-      player.width = player.nonStretchedSize;
-      player.height = player.nonStretchedSize;
+  if (player.movement) {
+    // A Key - Move left
+    if (keyIsDown(65) && player.x - player.nonStretchedSize/2 > 0) { 
+      player.x -= player.dx;
+      isMoving = true;
+      player.moved = true;
+  
+      // Don't stretch if the player is going sideways
+      if (keyIsDown(87) || keyIsDown(83)) {
+        player.width = player.nonStretchedSize;
+        player.height = player.nonStretchedSize;
+      }
+      else {
+        player.width = player.stretchedMax;
+        player.height = player.stretchedMin;
+      }
     }
-    else {
+  
+    // D Key - Move right
+    if (keyIsDown(68) && player.x + player.nonStretchedSize/2 < width) {
+      player.x += player.dx;
+      isMoving = true;
+      player.moved = true;
+  
+      if (keyIsDown(87) || keyIsDown(83)) {
+        player.width = player.nonStretchedSize;
+        player.height = player.nonStretchedSize;
+      }
+      else {
+        player.width = player.stretchedMax;
+        player.height = player.stretchedMin;
+      }
+    }
+  
+    // W Key - Move up
+    if (keyIsDown(87) && player.y - player.nonStretchedSize/2 > 0) {
+      player.y -= player.dy;
+      isMoving = true;
+      player.moved = true;
+  
+      if (keyIsDown(68) || keyIsDown(65)) {
+        player.width = player.nonStretchedSize;
+        player.height = player.nonStretchedSize;
+      }
+      else {
+        player.width = player.stretchedMin;
+        player.height = player.stretchedMax;
+      }
+    }
+  
+    // S Key - Move down
+    if (keyIsDown(83) && player.y + player.nonStretchedSize/2 < height) {
+      player.y += player.dy;
+      isMoving = true;
+      player.moved = true;
+  
+      if (keyIsDown(68) || keyIsDown(65)) {
+        player.width = player.nonStretchedSize;
+        player.height = player.nonStretchedSize;
+      }
+      else {
+        player.width = player.stretchedMin;
+        player.height = player.stretchedMax;
+      }
+    }
+  
+    if (!isMoving && player.moved) {
       player.width = player.stretchedMax;
-      player.height = player.stretchedMin;
-    }
-  }
-
-  // D Key - Move right
-  if (keyIsDown(68) && player.x + player.nonStretchedSize/2 < width) {
-    player.x += player.dx;
-    isMoving = true;
-    player.moved = true;
-
-    if (keyIsDown(87) || keyIsDown(83)) {
-      player.width = player.nonStretchedSize;
-      player.height = player.nonStretchedSize;
-    }
-    else {
-      player.width = player.stretchedMax;
-      player.height = player.stretchedMin;
-    }
-  }
-
-  // W Key - Move up
-  if (keyIsDown(87) && player.y - player.nonStretchedSize/2 > 0) {
-    player.y -= player.dy;
-    isMoving = true;
-    player.moved = true;
-
-    if (keyIsDown(68) || keyIsDown(65)) {
-      player.width = player.nonStretchedSize;
-      player.height = player.nonStretchedSize;
-    }
-    else {
-      player.width = player.stretchedMin;
       player.height = player.stretchedMax;
+      setTimeout(() => {
+        player.width = player.nonStretchedSize;
+        player.height = player.nonStretchedSize;
+      }, 50);
+      player.moved = false;
     }
+  
+    player.dx = 5;
+    player.dy = 5;
   }
-
-  // S Key - Move down
-  if (keyIsDown(83) && player.y + player.nonStretchedSize/2 < height) {
-    player.y += player.dy;
-    isMoving = true;
-    player.moved = true;
-
-    if (keyIsDown(68) || keyIsDown(65)) {
-      player.width = player.nonStretchedSize;
-      player.height = player.nonStretchedSize;
-    }
-    else {
-      player.width = player.stretchedMin;
-      player.height = player.stretchedMax;
-    }
-  }
-
-  if (!isMoving && player.moved) {
-    player.width = player.stretchedMax;
-    player.height = player.stretchedMax;
-    setTimeout(() => {
-      player.width = player.nonStretchedSize;
-      player.height = player.nonStretchedSize;
-    }, 50);
-    player.moved = false;
-  }
-
-  player.dx = 5;
-  player.dy = 5;
 }
