@@ -104,9 +104,6 @@ class Circles {
       else {
         fill(252, 31, 109, this.alpha);
       }
-      if (player.hit === true) {
-        fill("red");
-      }
       circle(this.x, this.y, this.radius * 2);
     }
   }
@@ -161,7 +158,7 @@ class Particle {
 }
 
 // Variables
-let state = "level";
+let state = "startup";
 let particles = [];
 let lastSpawnTime = 0;
 let spawnInterval = 100;
@@ -180,6 +177,8 @@ let playADramaticIrony = true;
 let squaresArray = [];
 let circlesArray = [];
 let aDramaticIronyMusic;
+let playerHit;
+let playerDead;
 
 // Load all assets
 function preload() {
@@ -187,6 +186,10 @@ function preload() {
   
   aDramaticIronyMusic = loadSound("assets/a dramatic irony.mp3");
   aDramaticIronyMusic.setVolume(0.2);
+
+  playerHit = loadSound("assets/player hit.mp3");
+
+  playerDead = loadSound("assets/player dead.mp3");
   
   gameLogo = {
     visual: loadImage("assets/logo.png"),
@@ -309,12 +312,13 @@ function aDramaticIrony() {
   if (playADramaticIrony === true) {
     let square;
     let circle;
-
     aDramaticIronyMusic.play();
-    // circle = new Circles(width/2, height/2, 30, 0, 0, 0, 0, 0, 3000, 100000, CORNER, 2000);
-    // circlesArray.push(circle);
+
+    circle = new Circles(width/2, height/2, 30, 1, 0, 0, 0, 0, 3000, 100000, CORNER, 2000);
+    circlesArray.push(circle);
+
     for (let i = 0; i <= 1000; i++) {
-      circle = new Circles(random(width), 0, 1, 0.1, 0, 1, 0, 0.1, 0, 10000, CORNER, 100 * i + 1000);
+      circle = new Circles(random(width), 0, 5, 0, 0, 1, 0, 0.1, 0, 10000, CORNER, 100 * i + 1000);
       circlesArray.push(circle);
     }
 
@@ -337,11 +341,11 @@ function aDramaticIrony() {
     //   square = new Squares(0, random(0, height), width, random(25, 50), 0, 0, 2500, 2000, CORNER, 1000 * i);
     //   squaresArray.push(square);
     // }
-    // for (let i = 0; i < 5; i++) {
-    //   setTimeout(() => {
-    //     screenShake(5);
-    //   }, 1500 * i);
-    // }
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => {
+        screenShake(5);
+      }, 1500 * i);
+    }
     playADramaticIrony = false;
   }
 }
@@ -367,6 +371,7 @@ function showCircles() {
 }
 
 function screenShake(loopNo) {
+  // Squares array
   for (let i = squaresArray.length - 1; i >= 0; i--) {
     for (let j = 0; j < loopNo; j++) {
       setTimeout(() => {
@@ -383,6 +388,36 @@ function screenShake(loopNo) {
       }
     }, loopNo * 20/2);
   }
+
+  // Circles array
+  for (let i = circlesArray.length - 1; i >= 0; i--) {
+    for (let j = 0; j < loopNo; j++) {
+      setTimeout(() => {
+        circlesArray[i].y += 1;
+      }, 20 * j);
+    }
+    setTimeout(() => {
+      for (let k = 0; k < loopNo; k++) {
+        setTimeout(() => {
+          circlesArray[i].y -= 1;
+        }, 20 * k);
+      }
+    }, loopNo * 20/2);
+  }
+
+  // Player
+  for (let j = 0; j < loopNo; j++) {
+    setTimeout(() => {
+      player.y += 0.5;
+    }, 20 * j);
+  }
+  setTimeout(() => {
+    for (let k = 0; k < loopNo; k++) {
+      setTimeout(() => {
+        player.y -= 0.5;
+      }, 20 * k);
+    }
+  }, loopNo * 20/2);
 }
 
 function checkCollision() {
@@ -555,6 +590,7 @@ function displayPlayButton() {
         menuTransition.levelTransition = true;
         menuMusic.stop();
         menuTransition.transitionSound.play();
+        player.lives = 3;
       };
     }
   }
@@ -669,18 +705,22 @@ function displayPlayerAndLives() {
   else if (player.x - player.nonStretchedSize <= 50 && player.y - player.nonStretchedSize <= 40) {
     fill(255, 254, 255);
   }
-  textAlign(LEFT);
-  stroke(5);
-  textFont("Courier New", 30);
-  text("❤︎", 10, 30);
-  textStyle(BOLD);
-  text(player.lives, 45, 28);
+
+  if (player.lives !== 99) {
+    textAlign(LEFT);
+    stroke(5);
+    textFont("Courier New", 30);
+    text("❤︎", 10, 30);
+    textStyle(BOLD);
+    text(player.lives, 45, 28);
+  }
 }
 
 function lives() {
   // Decrease lives and grant i frames
   if (player.hit && player.invincible === false) {
     player.lives -= 1;
+    playerHit.play();
     player.invincible = true;
     player.iFrameTimer = millis() + 3000;
   }
@@ -689,6 +729,32 @@ function lives() {
   }
   if (millis() > player.iFrameTimer) {
     player.invincible = false;
+  }
+  if (player.lives <= 0) {
+    playerDead.play();
+    aDramaticIronyMusic.stop();
+
+    setTimeout(() => {
+      state = "menu";
+      menuBackground.velocityIncrease = 0.1;
+      menuMusic.play();
+      menuTransition.levelTransition = false;
+      playADramaticIrony = true;
+      squaresArray = [];
+      circlesArray = [];
+      menuBackground.velocityIncrease = 0.05;
+      menuBackground.circleCount = 20;
+      player.x = width/2;
+      player.y = height/2;
+    }, menuTransition.transitionTime + 1000);
+
+    setTimeout(() => {
+      menuTransition.levelTransition = true;
+      menuMusic.stop();
+      menuTransition.transitionSound.play();
+    }, 1000);
+
+    player.lives = 99;
   }
 }
 
