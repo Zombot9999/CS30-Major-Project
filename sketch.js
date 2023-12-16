@@ -258,7 +258,7 @@ function setup() {
     y: height/2,
     dx: 5,
     dy: 5,
-    lives: 3,
+    lives: 5,
     hit: false,
     invincible: false,
     iFrameTimer: 0,
@@ -330,35 +330,85 @@ function aDramaticIrony() {
       
       for (let i = 0; i <= 30; i++) {
         let size = random([75, 125]);
-        square = new Squares(random(width), random(height), size, size, 0, 0, 750, 2000, CORNER, i * 700);
+        square = new Squares(random(size, width - size), random(size, height - size), size, size, 0, 0, 750, 2000, CORNER, i * 700);
         squaresArray.push(square);
-        circle = new Circles(random(width), 0, 5, 0, 0, 1, 0, 0.1, 0, 2000, CORNER, 700 * i);
+      }
+
+      circle = new Circles(random(width), 0, 10, 0, 0, 1, 0, 0.1, 0, 2000, CORNER, 700);
+      circlesArray.push(circle);
+
+      setTimeout(() => {
+        for (let i = 0; i <= 30; i++) {
+          circle = new Circles(random(width), 0, 10, 0, 0, 1, 0, 0.1, 0, 2000, CORNER, 500 * i);
+          circlesArray.push(circle);
+        }
+        setTimeout(() => {
+          for (let i = 0; i <= 100; i++) {
+            circle = new Circles(random(width), 0, 10, 0, 0, 1, 0, 0.3, 0, 2000, CORNER, 100 * i);
+            circlesArray.push(circle);
+          }
+        }, 6000);
+      }, 6000);
+
+      square = new Squares(0, 0, 100, height, 0, 0, 1000, 12000, CORNER, 22000);
+      squaresArray.push(square);
+      square = new Squares(width - 100, 0, 100, height, 0, 0, 1000, 12000, CORNER, 22000);
+      squaresArray.push(square);
+      square = new Squares(0, 0, width, 100, 0, 0, 1000, 12000, CORNER, 22000);
+      squaresArray.push(square);
+      square = new Squares(0, height - 100, width, 100, 0, 0, 1000, 12000, CORNER, 22000);
+      squaresArray.push(square);
+      setTimeout(() => {
+        screenShake(5);
+      }, 23000); 
+
+      square = new Squares(0, 0, 200, height, 0, 0, 1000, 8500, CORNER, 25500);
+      squaresArray.push(square);
+      square = new Squares(width - 200, 0, 200, height, 0, 0, 1000, 8500, CORNER, 25500);
+      squaresArray.push(square);
+      square = new Squares(0, 0, width, 200, 0, 0, 1000, 8500, CORNER, 25500);
+      squaresArray.push(square);
+      square = new Squares(0, height - 200, width, 200, 0, 0, 1000, 8500, CORNER, 25500);
+      squaresArray.push(square);
+      setTimeout(() => {
+        screenShake(5);
+      }, 26500); 
+
+      square = new Squares(0, 0, 250, height, 0, 0, 1000, 5000, CORNER, 28000);
+      squaresArray.push(square);
+      square = new Squares(width - 250, 0, 250, height, 0, 0, 1000, 5000, CORNER, 28000);
+      squaresArray.push(square);
+      square = new Squares(0, 0, width, 250, 0, 0, 1000, 5000, CORNER, 28000);
+      squaresArray.push(square);
+      square = new Squares(0, height - 250, width, 250, 0, 0, 1000, 5000, CORNER, 28000);
+      squaresArray.push(square);
+      setTimeout(() => {
+        screenShake(5);
+      }, 29000); 
+
+      for (let i = 0; i <= 2; i++) {
+        circle = new Circles(width - 250, height - 325, 50, 0, -1, 0, -0.5, 0, 0, 2000, CORNER, 1000 * i + 29000);
+        circlesArray.push(circle);
+      }
+      for (let i = 0; i <= 2; i++) {
+        circle = new Circles(250, height - 325, 50, 0, 1, 0, 0.5, 0, 0, 2000, CORNER, 1000 * i + 32000);
         circlesArray.push(circle);
       }
 
-      square = new Squares(0, 0, 100, height, 0, 0, 1000, 10000, CORNER, 22000);
+      square = new Squares(0, -height, width, height, 0, 0.35, 0, 12000, CORNER, 35000); 
       squaresArray.push(square);
-      square = new Squares(width - 100, 0, 100, height, 0, 0, 1000, 10000, CORNER, 22000);
+      square = new Squares(0, height, width, height, 0, -0.35, 0, 12000, CORNER, 35000);
       squaresArray.push(square);
-      square = new Squares(0, 0, width, 100, 0, 0, 1000, 10000, CORNER, 22000);
-      squaresArray.push(square);
-      square = new Squares(0, height - 100, width, 100, 0, 0, 1000, 10000, CORNER, 22000);
-      squaresArray.push(square);
-      setTimeout(() => {
-        screenShake(10);
-      }, 23000);
 
-      square = new Squares(0, 0, 200, height, 0, 0, 1000, 10000, CORNER, 25500);
-      squaresArray.push(square);
-      square = new Squares(width - 200, 0, 200, height, 0, 0, 1000, 10000, CORNER, 25500);
-      squaresArray.push(square);
-      square = new Squares(0, 0, width, 200, 0, 0, 1000, 10000, CORNER, 25500);
-      squaresArray.push(square);
-      square = new Squares(0, height - 200, width, 200, 0, 0, 1000, 10000, CORNER, 25500);
-      squaresArray.push(square);
-      setTimeout(() => {
-        screenShake(10);
-      }, 26500);
+      for (let i = 0; i <= 8; i++) {
+        if (i%2 === 1) {
+          square = new Squares(0, 0, 5 * (i + 1), height, 5 + i, 0, 500, 5000, CORNER, i * 1000 + 36000);
+        }
+        else {
+          square = new Squares(width - 5 * (i + 1), 0, 5 * (i + 1), height, -5 - i, 0, 500, 5000, CORNER, i * 1000 + 36000);
+        }
+        squaresArray.push(square);
+      }
 
     }, 1000);
 
@@ -391,15 +441,13 @@ function screenShake(loopNo) {
   for (let i = squaresArray.length - 1; i >= 0; i--) {
     for (let j = 0; j < loopNo; j++) {
       setTimeout(() => {
-        squaresArray[i].y += 1;
-        player.y += 0.5;
+        squaresArray[i].y += 3;
       }, 20 * j);
     }
     setTimeout(() => {
       for (let k = 0; k < loopNo; k++) {
         setTimeout(() => {
-          squaresArray[i].y -= 1;
-          player.y -= 0.5;
+          squaresArray[i].y -= 3;
         }, 20 * k);
       }
     }, loopNo * 20/2);
@@ -409,13 +457,13 @@ function screenShake(loopNo) {
   for (let i = circlesArray.length - 1; i >= 0; i--) {
     for (let j = 0; j < loopNo; j++) {
       setTimeout(() => {
-        circlesArray[i].y += 1;
+        circlesArray[i].y += 3;
       }, 20 * j);
     }
     setTimeout(() => {
       for (let k = 0; k < loopNo; k++) {
         setTimeout(() => {
-          circlesArray[i].y -= 1;
+          circlesArray[i].y -= 3;
         }, 20 * k);
       }
     }, loopNo * 20/2);
@@ -424,13 +472,13 @@ function screenShake(loopNo) {
   // Player
   for (let j = 0; j < loopNo; j++) {
     setTimeout(() => {
-      player.y += 0.5;
+      player.y += 1;
     }, 20 * j);
   }
   setTimeout(() => {
     for (let k = 0; k < loopNo; k++) {
       setTimeout(() => {
-        player.y -= 0.5;
+        player.y -= 1;
       }, 20 * k);
     }
   }, loopNo * 20/2);
@@ -606,7 +654,7 @@ function displayPlayButton() {
         menuTransition.levelTransition = true;
         menuMusic.stop();
         menuTransition.transitionSound.play();
-        player.lives = 3;
+        player.lives = 5;
       };
     }
   }
@@ -782,7 +830,7 @@ function lives() {
   if (millis() > player.iFrameTimer) {
     player.invincible = false;
   }
-  if (player.lives <= -99) {
+  if (player.lives <= 0) {
     playerDead.play();
     aDramaticIronyMusic.stop();
 
