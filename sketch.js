@@ -138,8 +138,14 @@ class Circles {
       else if (this.warningStart + this.warningTime < millis()) {
         this.x += this.dx;
         this.y += this.dy;
-        this.dx += this.vx;
-        this.dy += this.vy;
+        if (this.vx < 0 || this.vy < 0) {
+          this.dx -= abs(this.vx);
+          this.dy -= abs(this.vy);
+        }
+        if (this.vx > 0 || this.vy > 0) {
+          this.dx += abs(this.vx);
+          this.dy += abs(this.vy);
+        }
         this.radius += this.radiusIncrease;
         if (this.radiusIncrease > 0) {
           this.spawnColor = true;
@@ -343,7 +349,7 @@ function aDramaticIrony() {
       
       // for (let i = 0; i <= 30; i++) {
       //   let size = random([75, 125]);
-      //   square = new Squares(random(size, width - size), random(size, height - size), size, size, random(-0.3, 0.3), random(-0.3, 0.3), 750, 2000, CORNER, i * 700, 0, 0);
+      //   square = new Squares(random(size, width - size), random(size, height - size), size, size, random(-0.5, 0.5), random(-0.25, 0.25), 750, 2000, CORNER, i * 700, 0, 0);
       //   squaresArray.push(square);
       // }
 
@@ -476,11 +482,11 @@ function aDramaticIrony() {
       //   screenShake(5);
       // }, 57300);
 
-      circle = new Circles(width/2, height/2, 5, 0.5, 0, 0, 0, 0, 500, 750, CORNER, 0);
+      circle = new Circles(width/2, height/2, 5, 0.5, 0, 0, 0, 0, 500, 1000, CORNER, 0);
       circlesArray.push(circle);
 
-      for (let i = 0; i < 12; i++) {
-        circle = new Circles(width/2, height/2, 10, 0, random(-5, 5), random(-5, 5), 0, 0, 0, 20000, CORNER, 1250);
+      for (let j = 0; j < 12; j++) {
+        circle = new Circles(width/2, height/2, 10, 0, cos(PI/6), sin(PI/6), 0, 0, 0, 20000, CORNER, 1000);
         circlesArray.push(circle);
       }
 
