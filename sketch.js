@@ -494,6 +494,15 @@ function aDramaticIrony() {
         screenShake(5);
       }, 59000);
 
+      for (let i = 59000; i < 62000; i += 500) { //59000; i < 62000
+        let position = random(height-height/2.5, height);
+        square = new Squares(-25, position, 25, 25, 2, 0, 500, 20000, CORNER, i, 0, 20);
+        squaresArray.push(square);
+        square = new Squares(-75, position + 5, 50, 10, 2, 0, 500, 20000, CORNER, i, 0, 20);
+        squaresArray.push(square);
+        square = new Squares(0, position, width, 25, 0, 0, 1500, -100, CORNER, i, 0, 0);
+        squaresArray.push(square);
+      }
       
       for (let k = 0; k <= 10; k++) {
 
@@ -544,6 +553,14 @@ function aDramaticIrony() {
           circle = new Circles(width/2 + cos(i), height/2 + sin(i), 7, 0, cos(i), sin(i), 1.005+j/1000, 1.005+j/1000, 0, 20000, CORNER, 83750, "multiply");
           circlesArray.push(circle);
         }
+      }
+
+
+      circle = new Circles(width/2, height/2, 50, 0, 0, 0, 0, 0, 1, 12250, CORNER, 1000, "add");
+      circlesArray.push(circle);
+      for (let i = 0; i < 3600; i += 360/30) {
+        circle = new Circles(width/2 + cos(i), height/2 + sin(i), 5, 0, cos(i), sin(i), 1.01, 1.01, 0, 10000, CORNER, i/30*100 + 1000, "multiply");
+        circlesArray.push(circle);
       }
 
     // Delay everything
@@ -710,7 +727,7 @@ function displayBackground() {
   pop();
 }
 
-// I had to make this bc the music wouldn't play without player interaction :(
+// I had to make this bc the music wouldn't play without player interaction 
 function startupMenu() {
   textAlign(CENTER);
   fill(252, 31, 109, startupAlpha);
@@ -1018,8 +1035,8 @@ function keyPressed() {
 
     for (let i = 0; i <= 15; i++) {
       setTimeout(() => {
-        player.dx += 8;
-        player.dy += 8;
+        player.dx += 10;
+        player.dy += 10;
         let newParticle = new Particle(player.x, player.y, 255, 10);      
         particles.push(newParticle);
       }, 10 * i);

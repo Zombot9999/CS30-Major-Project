@@ -2,7 +2,7 @@
 My Project will be an improvement of the grid assignment where the player is able to move and dodge certain attack patterns.
 
 ## Needs To Have List
-- A start screen instead of just being thrown into the game
+- A start screen instead of just being thrown into the game ✓
 - Instructions
 - A better movement system ✓
     - Player can move freely without being trapped in a square ✓ 
@@ -10,11 +10,11 @@ My Project will be an improvement of the grid assignment where the player is abl
 - A dash function ✓
 - Player becomes invincible during dash ✓
 - At least 1 level 
-- Different attacks happening as time goes on
+- Different attacks happening as time goes on ✓
 - Grading system where the player gets a rating on how well they did
 - A currency the player gets when they win
-- Sound effects
-- Music that goes with the attacks
+- Sound effects ✓
+- Music that goes with the attacks ✓
 
 ## Nice To Have List
 - Level selection screen 
