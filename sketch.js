@@ -191,7 +191,7 @@ class Particle {
 }
 
 // Variables
-let state = "level";
+let state = "startup";
 let particles = [];
 let lastSpawnTime = 0;
 let spawnInterval = 100;
@@ -555,13 +555,12 @@ function aDramaticIrony() {
         }
       }
 
-
-      circle = new Circles(width/2, height/2, 50, 0, 0, 0, 0, 0, 1, 12250, CORNER, 1000, "add");
-      circlesArray.push(circle);
-      for (let i = 0; i < 3600; i += 360/30) {
-        circle = new Circles(width/2, height/2, 5, 0, cos(i), sin(i), 1.01, 1.01, 0, 10000, CORNER, i/30*100 + 1000, "multiply");
-        circlesArray.push(circle);
-      }
+      // circle = new Circles(width/2, height/2, 50, 0, 0, 0, 0, 0, 1, 12250, CORNER, 1000, "add");
+      // circlesArray.push(circle);
+      // for (let i = 0; i < 3600; i += 360/30) {
+      //   circle = new Circles(width/2, height/2, 5, 0, cos(i), sin(i), 1.01, 1.01, 0, 10000, CORNER, i/30*100 + 1000, "multiply");
+      //   circlesArray.push(circle);
+      // }
 
     // Delay everything
     }, 1000);
