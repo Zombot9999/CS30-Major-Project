@@ -819,7 +819,7 @@ function displayPlayButton() {
         menuTransition.levelTransition = true;
         menuMusic.stop();
         menuTransition.transitionSound.play();
-        player.lives = 5;
+        player.lives = 69420;
       };
     }
   }
