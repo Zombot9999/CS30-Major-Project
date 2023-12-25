@@ -352,12 +352,14 @@ function aDramaticIrony() {
     setTimeout(() => {
       aDramaticIronyMusic.play();
       
+      // Spawn squares at random places
       for (let i = 0; i <= 30; i++) {
         let size = random([75, 125]);
         square = new Squares(random(size, width - size), random(size, height - size), size, size, random(-0.5, 0.5), random(-0.25, 0.25), 750, 2000, CORNER, i * 700, 0, 0);
         squaresArray.push(square);
       }
 
+      // Spawn circles dropping from the top of the screen
       circle = new Circles(random(width), 0, 6, 0, 0, 1, 0, 0.1, 0, 2000, CORNER, 700, "add");
       circlesArray.push(circle);
 
@@ -374,6 +376,8 @@ function aDramaticIrony() {
         }, 6000);
       }, 6000);
 
+
+      // Borders
       square = new Squares(0, 0, (height - 50)/6, height, 0, 0, 1500, 12000, CORNER, 22000, 0, 0); 
       squaresArray.push(square);
       square = new Squares(width - (height - 50)/6, 0, (height - 50)/6, height, 0, 0, 1500, 12000, CORNER, 22000, 0, 0);
@@ -410,15 +414,27 @@ function aDramaticIrony() {
         screenShake(5);
       }, 29000); 
 
-      for (let i = 0; i <= 2; i++) {
+      // Circles between the borders
+      for (let i = 0; i < 3; i++) {
         circle = new Circles(width - 300, height/2, height/10, 0, -1, 0, -0.5, 0, 0, 2000, CORNER, 1000 * i + 29000, "add"); 
         circlesArray.push(circle);
       }
-      for (let i = 0; i <= 2; i++) {
-        circle = new Circles(300, height/2, height/12, 0, 1, 0, 0.5, 0, 0, 2000, CORNER, 1000 * i + 32000, "add"); 
-        circlesArray.push(circle);
+
+      // Lines and the rectangle in the middle
+      for (let i = 1; i * 30 < width/2 - width/22; i++) {
+        square = new Squares(i * 30, 0, 20, height, 0, 0, 500, 1500, CORNER, 32000 + i * 50, 0, 0); 
+        squaresArray.push(square);
+        square = new Squares(width - i * 30, 0, 20, height, 0, 0, 500, 1500, CORNER, 32000 + i * 50, 0, 0); //32000
+        squaresArray.push(square);
       }
 
+      square = new Squares(width/2 - width/30, 0, width/15, height, 0, 0, 3000, 1000, CORNER, 32000, 0, 0); //32000
+      squaresArray.push(square);
+      setTimeout(() => {
+        screenShake(5);
+      }, 35000); 
+
+      // 2 rectangles that trap the player
       square = new Squares(0, -height, width, height, 0, 0.35, 0, 12000, CORNER, 35000, 0, 0); 
       squaresArray.push(square);
       square = new Squares(0, height, width, height, 0, -0.35, 0, 12000, CORNER, 35000, 0, 0);
@@ -427,6 +443,7 @@ function aDramaticIrony() {
         screenShake(5);
       }, 47000); 
 
+      // Exploding circles and the lines to dash through
       circle = new Circles(width/2, height/2, 30, 0, 0, 0, 0, 0, 2000, 0, CORNER, 36000, "add");
       circlesArray.push(circle);
       for (let i = 0; i <= 8; i++) {
@@ -446,10 +463,9 @@ function aDramaticIrony() {
           square = new Squares(width - 5 * (i + 1), 0, 5 * (i + 1), height, -5 - i, 0, 500, 5000, CORNER, i * 1000 + 36000, 0, 0);
         }
         squaresArray.push(square);
-
       }
 
-
+      // Rectangles that go from up to down 
       for (let i = 46000; i <= 48500; i += 500) { 
         let position = random(100, width - 100);
         square = new Squares(position, -(height * 20), 200, 20 * height, 0, 0.2, 2000, 1000, CORNER, i, 75, 0);
@@ -461,6 +477,8 @@ function aDramaticIrony() {
           screenShake(5);
         }, i + 2000);
       }
+
+      // Spawn the last one wherever the player is
       setTimeout(() => {
         square = new Squares(player.x - 100, -(height * 20), 200, 20 * height, 0, 0.2, 2000, 1000, CORNER, 0, 75, 0);
         squaresArray.push(square);
@@ -472,12 +490,14 @@ function aDramaticIrony() {
         screenShake(5);
       }, 51000);
 
+      // Spawn a bunch of lines in the middle with not many warning frames
       for (let elements of [[-50, 100, 51000], [-85, 30, 51125], [55, 30, 51250], [-110, 20, 51375], [90, 20, 51500], [-135, 20, 51425], [115, 20, 51550]]) {
         square = new Squares(0, height/2 + elements[0], width, elements[1], 0, 0, 500, 1000, CORNER, elements[2], 0, 0);
         squaresArray.push(square);
       }
 
-      for (let i = 52300; i < 55300; i += 500) { //52300; i < 55800
+      // Rectangles that go from left to right
+      for (let i = 52300; i < 55300; i += 500) { 
         let position = random(50, height- 50);
         square = new Squares(-(width * 20), position, width * 20, 100, 0.4, 0, 2000, 1000, CORNER, i, 0, 100);
         squaresArray.push(square);
@@ -489,6 +509,7 @@ function aDramaticIrony() {
         }, i + 2000);
       }
 
+      // Spawn the last one wherever the player is
       setTimeout(() => {
         square = new Squares(-(width * 20), player.y - 50, width * 20, 100, 0.4, 0, 2000, 1000, CORNER, 0, 0, 100);
         squaresArray.push(square);
@@ -500,24 +521,26 @@ function aDramaticIrony() {
         screenShake(5);
       }, 57300);
 
+      // Lines to corner the player
       for (let i = 0; i * 30 < width/1.5; i++) {
         square = new Squares(i * 30, 0, 20, height, 0, 0, 1000, 500, CORNER, 56000 + i * 50, 0, 0); 
         squaresArray.push(square);
       }
 
+      // Spawn rectangles to the right and on top of the screen
       square = new Squares(width/1.5, -(height * 20), width/1.5, 20 * height, 0, 0.2, 2000, 1000, CORNER, 57000, 75, 0);
       squaresArray.push(square);
       square = new Squares(width/1.5, 0, width/1.5, height, 0, 0, 2000, 0, CORNER, 57000, 0, 0);
       squaresArray.push(square);
-      
       square = new Squares(0, 0, width, height/1.5, 0, 0, 2000, 5000, CORNER, 57000, 0, 0);
       squaresArray.push(square);
       setTimeout(() => {
         screenShake(5);
       }, 59000);
 
+      // Rectangles that go from left to right with a trail
       for (let i = 60000; i < 63000; i += 500) {
-        let position = random(height-height/2.5, height);
+        let position = random(height/1.5, height);
         square = new Squares(-25, position, 25, 25, 2, 0, 500, 20000, CORNER, i, 0, 20);
         squaresArray.push(square);
         square = new Squares(-75, position + 5, 50, 10, 2, 0, 500, 20000, CORNER, i, 0, 20);
@@ -526,15 +549,15 @@ function aDramaticIrony() {
         squaresArray.push(square);
       }
       
+      // Exploding circles to the left, right and middle
       for (let k = 0; k <= 10; k++) {
-
         if (k % 3 === 0) {
           circle = new Circles(width, height/2, 5, 0.5, -1, 0, 0, 0, 500, 750, CORNER, 64000 + 1000 * k, "add"); 
           circlesArray.push(circle);
           angleMode(DEGREES);
           let circleAmount = floor(random(10, 25));
           for (let i = 0; i <= 360; i += 360/circleAmount) {
-            circle = new Circles(width + cos(i) - 60, height/2 + sin(i), 10, 0, cos(i), sin(i), 1.005 + k/200, 1.005 + k/200, 0, 20000, CORNER, 65250 + 1000 * k, "multiply");
+            circle = new Circles(width + cos(i) - 80, height/2 + sin(i), 10, 0, cos(i), sin(i), 1.005 + k/200, 1.005 + k/200, 0, 20000, CORNER, 65250 + 1000 * k, "multiply");
             circlesArray.push(circle);
           }
         }
@@ -545,7 +568,7 @@ function aDramaticIrony() {
           angleMode(DEGREES);
           let circleAmount = floor(random(10, 25));
           for (let i = 0; i < 360; i += 360/circleAmount) {
-            circle = new Circles(cos(i) + 60, height/2 + sin(i), 10, 0, cos(i), sin(i), 1.005 + k/200, 1.005 + k/200, 0, 20000, CORNER, 65250 + 1000 * k, "multiply");
+            circle = new Circles(cos(i) + 80, height/2 + sin(i), 10, 0, cos(i), sin(i), 1.005 + k/200, 1.005 + k/200, 0, 20000, CORNER, 65250 + 1000 * k, "multiply");
             circlesArray.push(circle);
           }
         }
@@ -562,6 +585,7 @@ function aDramaticIrony() {
         }
       }
 
+      // Circle in the middle of the screen that grows and explodes
       circle = new Circles(width/2, height/2, 5, 0.5, 0, 0, 0, 0, 500, 8250, CORNER, 75000, "add");
       circlesArray.push(circle);
       for (let i = 0; i < 1440; i += 360/30) {
@@ -577,6 +601,7 @@ function aDramaticIrony() {
         }
       }
 
+      // Another circle that spawns in the middle and shoots out smaller circles around it
       circle = new Circles(width/2, height/2, 50, 0, 0, 0, 0, 0, 500, 12250, CORNER, 85000, "add");
       circlesArray.push(circle);
       for (let i = 0; i < 3600; i += 360/30) {
@@ -587,6 +612,7 @@ function aDramaticIrony() {
         screenShake(5);
       }, 97750);
 
+      // Pattern on the top and bottom of the screen
       for (let i = 0; i < 120; i++) {
         if (i % 2 === 0) {
           square = new Squares(width + i * 50 + 5 * i, height - 50, 50, 50, -25, 0, 1000, 5000 + i * 200, CORNER, 83500, 0, -2);
@@ -602,6 +628,7 @@ function aDramaticIrony() {
         }
       }
 
+      // Circles on the left side and right side
       for (let i = 0; i < 8; i++) {
         circle = new Circles(0, i*(height/8) + height/16, height/16, 0, 0, 0, 0, 0, 500, 10000, CORNER, 85000 + 250 * i, "add");
         circlesArray.push(circle);
@@ -609,6 +636,7 @@ function aDramaticIrony() {
         circlesArray.push(circle);
       }
 
+      // 4 rectangles going top to bottom
       for (let i = 1; i < 5; i++) { 
         let xpos = (width/4 - 100) * i;
         square = new Squares(xpos, -(height * 20), 200, 20 * height, 0, 0.2, 2000, 1000, CORNER, 87000 + 1000 * i, 75, 0);
@@ -623,7 +651,22 @@ function aDramaticIrony() {
           screenShake(5);
         }, 106500 + 1000 * (i-1));
       }
+      square = new Squares(-width, 0, width, height, 1.5, 0, 0, 6000, CORNER, 98000, 0, 0);
+      squaresArray.push(square);
+      square = new Squares(width, 0, width*2, height, -1.5, 0, 0, 6000, CORNER, 98000, 0, 0);
+      squaresArray.push(square);
 
+      // Spawn strips of squares in random y spots  with a random dy value
+      for (let j = 0; j < 10; j++) {
+        let ypos = random(100, height - 100);
+        let dy = random(-1.5, 1.5);
+        for (let i = 0; i * 30 < width; i++) {
+          square = new Squares(i * 30, ypos, 20, 20, 0.5, dy, 750, 1000, CORNER, 98000 + j * 500 + 10 * i, 0, 0); 
+          squaresArray.push(square);
+        }
+      }
+
+      // Force player into a small area in the middle
       square = new Squares(-(width*80), 0, width * 80, height/2 - 50, 0.2, 0, 2000, 7000, CORNER, 104500, 0, 75); 
       squaresArray.push(square);
       square = new Squares(0, 0, width, height/2 - 50, 0, 0, 2000, 0, CORNER, 104500, 0, 0);
@@ -640,20 +683,6 @@ function aDramaticIrony() {
       squaresArray.push(square);
       square = new Squares(width - (width/2 - 50), 0, width/2 - 50, height, 0, 0, 2000, 0, CORNER, 107500, 0, 0);
       squaresArray.push(square);
-      
-      square = new Squares(-width, 0, width, height, 1.5, 0, 0, 6000, CORNER, 98000, 0, 0);
-      squaresArray.push(square);
-      square = new Squares(width, 0, width*2, height, -1.5, 0, 0, 6000, CORNER, 98000, 0, 0);
-      squaresArray.push(square);
-
-      for (let j = 0; j < 10; j++) {
-        let ypos = random(100, height - 100);
-        let dy = random(-1.5, 1.5);
-        for (let i = 0; i * 30 < width; i++) {
-          square = new Squares(i * 30, ypos, 20, 20, 0.5, dy, 750, 1000, CORNER, 98000 + j * 500 + 10 * i, 0, 0); //98000
-          squaresArray.push(square);
-        }
-      }
 
     // Delay everything
     }, 1000);
