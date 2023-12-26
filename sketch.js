@@ -53,9 +53,6 @@ class Squares {
       else {
         fill(252, 31, 109);
       }
-      // if (player.hit === true) {
-      //   fill("red");
-      // }
       rect(this.x, this.y, this.width, this.height);
     }
   }
@@ -70,10 +67,17 @@ class Squares {
         this.dx = this.dxIncrease;
         this.x += this.dx;
         this.y += this.dy;
+        if (collideRectRect(player.x - player.width/2, player.y - player.height/2, player.width, player.height, this.x, this.y, this.width, this.height)) {
+          player.hit = true;
+          console.log(player.hit);
+        }
       }
       if (this.warningStart + this.warningTime < millis() || this.dyIncrease !== 0 || this.dxIncrease !== 0) {
         this.x += this.dx;
         this.y += this.dy;
+        if (collideRectRect(player.x - player.width/2, player.y - player.height/2, player.width, player.height, this.x, this.y, this.width, this.height)) {
+          player.hit = true;
+        }
       }
     }
   }
@@ -192,6 +196,7 @@ class Particle {
 
 // Variables
 let state = "level";
+let allowButtonClick = true;
 let particles = [];
 let lastSpawnTime = 0;
 let spawnInterval = 100;
@@ -213,6 +218,8 @@ let aDramaticIronyMusic;
 let playerHit;
 let playerDead;
 let isScreenWhite = false;
+let tutorialVariables;
+let timeouts = [];
 
 // Load all assets
 function preload() {
@@ -247,6 +254,12 @@ function preload() {
 
   menuMusic = loadSound("assets/menu music.mp3");
   menuMusic.setVolume(0.1);
+
+  tutorialVariables = {
+    music: loadSound("assets/Tutorial Music.mp3"),
+    tutorialPlayed: false,
+  };
+  tutorialVariables.music.setVolume(0.5);
 }
 
 // Setup the variables and modes
@@ -265,6 +278,7 @@ function setup() {
     angle: 0,
   };
 
+  // eslint-disable-next-line no-undef
   playButton = new Clickable();
   
   playButtonVariables = {
@@ -342,12 +356,55 @@ function draw() {
     rectMode(CORNER);
     whiteScreen();
   }
+
+  else if (state === "tutorial") {
+    background(23, 17, 28);
+    checkCollision();
+    showSquares();
+    showCircles();
+    showParticles();
+    playerBorders();
+    lives();
+    tutorial();
+    rectMode(CENTER);
+    displayPlayerAndLives();
+    transition();
+    move();
+    rectMode(CORNER);
+    whiteScreen();
+  }
+}
+
+function tutorial() {
+  let timeoutID;
+  if (tutorialVariables.tutorialPlayed === false) {
+    tutorialVariables.tutorialPlayed = true;
+    setTimeout(() => {
+      tutorialVariables.music.play();
+      for (let i = 1000; i <= 100000; i += 500) { 
+        let position = random(100, width - 100);
+        square = new Squares(position, -(height * 20), 200, 20 * height, 0, 0.2, 2000, 1000, CORNER, i, 75, 0);
+        squaresArray.push(square);
+        square = new Squares(position, 0, 200, height, 0, 0, 2000, 0, CORNER, i, 0, 0);
+        squaresArray.push(square);
+        
+        timeoutID = setTimeout(() => {
+          screenShake(5);
+        }, i + 2000);
+        timeouts.push(timeoutID);
+
+      }
+
+    // Delay everything
+    }, 2000); 
+  }
 }
 
 function aDramaticIrony() {
   if (playADramaticIrony === true) {
     let square;
     let circle;
+    let timeoutID;
 
     setTimeout(() => {
       aDramaticIronyMusic.play();
@@ -386,9 +443,10 @@ function aDramaticIrony() {
       squaresArray.push(square);
       square = new Squares(0, height - (height - 50)/6, width, (height - 50)/6, 0, 0, 1500, 12000, CORNER, 22000, 0, 0);
       squaresArray.push(square);
-      setTimeout(() => {
+      timeoutID = setTimeout(() => {
         screenShake(5);
       }, 23500); 
+      timeouts.push(timeoutID);
 
       square = new Squares(0, 0, (height - 50)/3, height, 0, 0, 1000, 8500, CORNER, 25500, 0, 0); 
       squaresArray.push(square);
@@ -398,9 +456,10 @@ function aDramaticIrony() {
       squaresArray.push(square);
       square = new Squares(0, height - (height - 50)/3, width, (height - 50)/3, 0, 0, 1000, 8500, CORNER, 25500, 0, 0);
       squaresArray.push(square);
-      setTimeout(() => {
+      timeoutID = setTimeout(() => {
         screenShake(5);
-      }, 26500); 
+      }, 26500);
+      timeouts.push(timeoutID); 
 
       square = new Squares(0, 0, (height - 50)/2.5, height, 0, 0, 1000, 5000, CORNER, 28000, 0, 0); 
       squaresArray.push(square);
@@ -410,9 +469,10 @@ function aDramaticIrony() {
       squaresArray.push(square);
       square = new Squares(0, height - (height - 50)/2.5, width, (height - 50)/2.5, 0, 0, 1000, 5000, CORNER, 28000, 0, 0);
       squaresArray.push(square);
-      setTimeout(() => {
+      timeoutID = setTimeout(() => {
         screenShake(5);
       }, 29000); 
+      timeouts.push(timeoutID);
 
       // Circles between the borders
       for (let i = 0; i < 3; i++) {
@@ -430,18 +490,21 @@ function aDramaticIrony() {
 
       square = new Squares(width/2 - width/30, 0, width/15, height, 0, 0, 3000, 1000, CORNER, 32000, 0, 0); //32000
       squaresArray.push(square);
-      setTimeout(() => {
+      timeoutID = setTimeout(() => {
         screenShake(5);
       }, 35000); 
+      timeouts.push(timeoutID);
 
       // 2 rectangles that trap the player
       square = new Squares(0, -height, width, height, 0, 0.35, 0, 12000, CORNER, 35000, 0, 0); 
       squaresArray.push(square);
       square = new Squares(0, height, width, height, 0, -0.35, 0, 12000, CORNER, 35000, 0, 0);
       squaresArray.push(square);
-      setTimeout(() => {
+      timeoutID = setTimeout(() => {
         screenShake(5);
       }, 47000); 
+      timeouts.push(timeoutID);
+
 
       // Exploding circles and the lines to dash through
       circle = new Circles(width/2, height/2, 30, 0, 0, 0, 0, 0, 2000, 0, CORNER, 36000, "add");
@@ -473,22 +536,25 @@ function aDramaticIrony() {
         square = new Squares(position, 0, 200, height, 0, 0, 2000, 0, CORNER, i, 0, 0);
         squaresArray.push(square);
         
-        setTimeout(() => {
+        timeoutID = setTimeout(() => {
           screenShake(5);
         }, i + 2000);
+        timeouts.push(timeoutID);
       }
 
       // Spawn the last one wherever the player is
-      setTimeout(() => {
+      timeoutID = setTimeout(() => {
         square = new Squares(player.x - 100, -(height * 20), 200, 20 * height, 0, 0.2, 2000, 1000, CORNER, 0, 75, 0);
         squaresArray.push(square);
         square = new Squares(player.x - 100, 0, 200, height, 0, 0, 2000, 0, CORNER, 0, 0, 0);
         squaresArray.push(square);
       }, 49000);
+      timeouts.push(timeoutID);
       
-      setTimeout(() => {
+      timeoutID = setTimeout(() => {
         screenShake(5);
       }, 51000);
+      timeouts.push(timeoutID);
 
       // Spawn a bunch of lines in the middle with not many warning frames
       for (let elements of [[-50, 100, 51000], [-85, 30, 51125], [55, 30, 51250], [-110, 20, 51375], [90, 20, 51500], [-135, 20, 51425], [115, 20, 51550]]) {
@@ -504,22 +570,25 @@ function aDramaticIrony() {
         square = new Squares(0, position, width, 100, 0, 0, 2000, 0, CORNER, i, 0, 0);
         squaresArray.push(square);
         
-        setTimeout(() => {
+        timeoutID = setTimeout(() => {
           screenShake(5);
         }, i + 2000);
+        timeouts.push(timeoutID);
       }
 
       // Spawn the last one wherever the player is
-      setTimeout(() => {
+      timeoutID = setTimeout(() => {
         square = new Squares(-(width * 20), player.y - 50, width * 20, 100, 0.4, 0, 2000, 1000, CORNER, 0, 0, 100);
         squaresArray.push(square);
         square = new Squares(0, player.y - 50, width, 100, 0, 0, 2000, 0, CORNER, 0, 0, 0);
         squaresArray.push(square);
       }, 55300);
+      timeouts.push(timeoutID);
       
-      setTimeout(() => {
+      timeoutID = setTimeout(() => {
         screenShake(5);
       }, 57300);
+      timeouts.push(timeoutID);
 
       // Lines to corner the player
       for (let i = 0; i * 30 < width/1.5; i++) {
@@ -534,9 +603,10 @@ function aDramaticIrony() {
       squaresArray.push(square);
       square = new Squares(0, 0, width, height/1.5, 0, 0, 2000, 5000, CORNER, 57000, 0, 0);
       squaresArray.push(square);
-      setTimeout(() => {
+      timeoutID = setTimeout(() => {
         screenShake(5);
       }, 59000);
+      timeouts.push(timeoutID);
 
       // Rectangles that go from left to right with a trail
       for (let i = 60000; i < 63000; i += 500) {
@@ -608,22 +678,23 @@ function aDramaticIrony() {
         circle = new Circles(width/2, height/2, 5, 0, cos(i), sin(i), 1.01, 1.01, 0, 10000, CORNER, i/30*100 + 85500, "multiply");
         circlesArray.push(circle);
       }
-      setTimeout(() => {
+      timeoutID = setTimeout(() => {
         screenShake(5);
       }, 97750);
+      timeouts.push(timeoutID);
 
       // Pattern on the top and bottom of the screen
       for (let i = 0; i < 120; i++) {
         if (i % 2 === 0) {
           square = new Squares(width + i * 50 + 5 * i, height - 50, 50, 50, -25, 0, 1000, 5000 + i * 200, CORNER, 83500, 0, -2);
           squaresArray.push(square);
-          square = new Squares(width + i * 50 + 5 * i, 0, 50, 75, -25, 0, 1000, 5000 + i * 200, CORNER, 83500, 0, -2);
+          square = new Squares(-(width/3 + i * 50 + 5 * i), 0, 50, 75, 35, 0, 1000, 5000 + i * 200, CORNER, 83500, 0, 2);
           squaresArray.push(square);
         }
         else {
           square = new Squares(width + i * 50 + 5 * i, height - 75, 50, 75, -25, 0, 1000, 5000 + i * 200, CORNER, 83500, 0, -2);
           squaresArray.push(square);
-          square = new Squares(width + i * 50 + 5 * i, 0, 50, 50, -25, 0, 1000, 5000 + i * 200, CORNER, 83500, 0, -2);
+          square = new Squares(-(width/3 + i * 50 + 5 * i), 0, 50, 50, 35, 0, 1000, 5000 + i * 200, CORNER, 83500, 0, 2); 
           squaresArray.push(square);
         }
       }
@@ -639,17 +710,19 @@ function aDramaticIrony() {
       // 4 rectangles going top to bottom
       for (let i = 1; i < 5; i++) { 
         let xpos = (width/4 - 100) * i;
-        square = new Squares(xpos, -(height * 20), 200, 20 * height, 0, 0.2, 2000, 1000, CORNER, 87000 + 1000 * i, 75, 0);
+        square = new Squares(xpos, -(height * 120), 200, 120 * height, 0, 0.2, 2000, 1000, CORNER, 87000 + 1000 * i, 75, 0); 
         squaresArray.push(square);
-        square = new Squares(xpos, 0, 200, height, 0, 0, 2000, 0, CORNER, 87000 + 950 * i, 0, 0);
+        square = new Squares(xpos, 0, 200, height, 0, 0, 2500, 0, CORNER, 87000 + 950 * i, 0, 0);
         squaresArray.push(square);
         
-        setTimeout(() => {
+        timeoutID = setTimeout(() => {
           screenShake(5);
         }, 89000 + 950 * i);
-        setTimeout(() => {
+        timeouts.push(timeoutID);
+        timeoutID = setTimeout(() => {
           screenShake(5);
         }, 106500 + 1000 * (i-1));
+        timeouts.push(timeoutID);
       }
       square = new Squares(-width, 0, width, height, 1.5, 0, 0, 6000, CORNER, 98000, 0, 0);
       squaresArray.push(square);
@@ -818,10 +891,13 @@ function displayBackground() {
   noStroke();
   push();
   angleMode(RADIANS);
+  // eslint-disable-next-line no-undef
   setCenter(width/2, height/2);
   rotate(menuBackground.angle);
   fill(252, 31, 109, 100);
+  // eslint-disable-next-line no-undef
   polarEllipses(menuBackground.circleCount, 50, 50, menuBackground.distance);
+  // eslint-disable-next-line no-undef
   polarEllipses(1, menuBackground.radius, menuBackground.radius, 0);
   if (menuBackground.distance < width/2 + menuBackground.radius * 5) {
     menuBackground.distance += menuBackground.circleVelocity;
@@ -843,6 +919,7 @@ function displayBackground() {
       } 
     }, 100);
   }
+  // eslint-disable-next-line no-undef
   setCenter(-width/2, -height/2);
   menuBackground.angle += 1;
   pop();
@@ -932,16 +1009,18 @@ function displayPlayButton() {
     };
   
     // If clicked change the state to level
-    if (menuTransition.levelTransition === false) {
+    if (menuTransition.levelTransition === false && allowButtonClick === true) {
       playButton.onPress = function(){
         setTimeout(() => {
           state = "level";
           menuBackground.velocityIncrease = 0.1;
+          allowButtonClick = true;
         }, menuTransition.transitionTime);
         menuTransition.levelTransition = true;
         menuMusic.stop();
         menuTransition.transitionSound.play();
         player.lives = 5;
+        allowButtonClick = false;
       };
     }
   }
@@ -1003,9 +1082,38 @@ function displayLogoAndMusic() {
     text("RE-MADE", width/2, gameLogo.animationY + gameLogo.height/2.5);
     image(gameLogo.visual, width/2, gameLogo.animationY, gameLogo.width, gameLogo.height); 
   }
+
+  if (mouseX < 85 && mouseY < 85) {
+    stroke(252, 31, 102);
+    fill(200, 69, 100);
+  }
+  else {
+    stroke(200, 69, 100);
+    fill(252, 31, 102);
+  }
+  rectMode(CORNER);
+  rect(10, 10, 75);
+  strokeWeight(10);
+  noStroke();
+  fill("white");
+  textFont("sans serif");
+  text("?", 10, 20, 75, 75);
 }
 
-
+function mousePressed() {
+  if (mouseX < 85 && mouseY < 85 && allowButtonClick === true && state === "menu") {
+    setTimeout(() => {
+      state = "tutorial";
+      menuBackground.velocityIncrease = 0.1;
+      allowButtonClick = true;
+    }, menuTransition.transitionTime);
+    menuTransition.levelTransition = true;
+    menuMusic.stop();
+    menuTransition.transitionSound.play();
+    player.lives = 5;
+    allowButtonClick = false;
+  }
+}
 
 function showParticles() {
   rectMode(CENTER);
@@ -1059,7 +1167,7 @@ function displayPlayerAndLives() {
 
   if (player.lives !== 99) {
     textAlign(LEFT);
-    stroke(5);
+    noStroke();
     textFont("Courier New", 30);
     text("❤︎", 10, 30);
     textStyle(BOLD);
@@ -1120,6 +1228,7 @@ function lives() {
   if (player.lives <= 0) {
     playerDead.play();
     aDramaticIronyMusic.stop();
+    tutorialVariables.music.stop();
 
     setTimeout(() => {
       state = "menu";
@@ -1127,8 +1236,12 @@ function lives() {
       menuMusic.play();
       menuTransition.levelTransition = false;
       playADramaticIrony = true;
+      tutorialVariables.tutorialPlayed = false;
       squaresArray = [];
       circlesArray = [];
+      for (let timeout of timeouts) {
+        clearTimeout(timeout);
+      }
       menuBackground.velocityIncrease = 0.05;
       menuBackground.circleCount = 20;
       player.x = width/2;
@@ -1147,7 +1260,7 @@ function lives() {
 
 function keyPressed() {
   // Space Bar - Dash
-  if (state === "level" && key === " " && millis() > player.dashTimer && player.movement) {
+  if ((state === "level" || state === "tutorial") && key === " " && millis() > player.dashTimer && player.movement) {
     // Give the player invincibility 
     if (player.invincible === false) {
       player.iFrameTimer = millis() + 200;
