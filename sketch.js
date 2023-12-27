@@ -116,6 +116,7 @@ class Circles {
           }, 200);
           fill("white");
         }
+
         else if (this.spawnColor === false && millis() + 100 > this.displayStart + this.displayTime) {
           if (this.radiusIncrease > 0) {
             this.radius -= this.radiusIncrease * 20;
@@ -124,10 +125,12 @@ class Circles {
             fill("white");
           }
         }
+
         else {
           fill(252, 31, 109);
         }
       }
+
       else {
         fill(252, 31, 109, this.alpha);
       }
@@ -140,6 +143,7 @@ class Circles {
       if (this.warningStart + this.warningTime > millis()) {
         this.alpha += 1;
       }
+
       else if (this.warningStart + this.warningTime < millis()) {
         this.x += this.dx;
         this.y += this.dy;
@@ -147,15 +151,19 @@ class Circles {
           this.dx -= abs(this.vx);
           this.dy -= abs(this.vy);
         }
+
         if ((this.vx > 0 || this.vy > 0) && this.velocityApply === "add") {
           this.dx += abs(this.vx);
           this.dy += abs(this.vy);
         }
+
         if (this.velocityApply === "multiply") {
           this.dx *= abs(this.vx);
           this.dy *= abs(this.vy);
         }
+
         this.radius += this.radiusIncrease;
+
         if (this.radiusIncrease > 0) {
           this.spawnColor = true;
         }
@@ -195,7 +203,7 @@ class Particle {
 }
 
 // Variables
-let state = "level";
+let state = "startup";
 let allowButtonClick = true;
 let particles = [];
 let lastSpawnTime = 0;
@@ -257,9 +265,9 @@ function preload() {
 
   tutorialVariables = {
     music: loadSound("assets/Tutorial Music.mp3"),
-    tutorialPlayed: false,
+    tutorialPlayed: true,
   };
-  tutorialVariables.music.setVolume(0.5);
+  tutorialVariables.music.setVolume(0.3);
 }
 
 // Setup the variables and modes
@@ -376,27 +384,24 @@ function draw() {
 }
 
 function tutorial() {
-  let timeoutID;
-  if (tutorialVariables.tutorialPlayed === false) {
-    tutorialVariables.tutorialPlayed = true;
+  if (tutorialVariables.tutorialPlayed === true) {
+    let circle;
+    let square;
+    let timeoutID;
+
     setTimeout(() => {
       tutorialVariables.music.play();
-      for (let i = 1000; i <= 100000; i += 500) { 
-        let position = random(100, width - 100);
-        square = new Squares(position, -(height * 20), 200, 20 * height, 0, 0.2, 2000, 1000, CORNER, i, 75, 0);
-        squaresArray.push(square);
-        square = new Squares(position, 0, 200, height, 0, 0, 2000, 0, CORNER, i, 0, 0);
-        squaresArray.push(square);
-        
-        timeoutID = setTimeout(() => {
-          screenShake(5);
-        }, i + 2000);
-        timeouts.push(timeoutID);
 
+      for (let i = 0; i < 5; i++) {
+        let xpos = random(100, width - 100);
+        let ypos = random(100, height - 100);
+        circle = new Circles(xpos, ypos, 75, 1, 0, 0, 0, 0, 1000, 750, CORNER, i * 500, "add");
+        circlesArray.push(circle);
       }
 
     // Delay everything
-    }, 2000); 
+    }, 1000);
+    tutorialVariables.tutorialPlayed = false;
   }
 }
 
@@ -408,7 +413,7 @@ function aDramaticIrony() {
 
     setTimeout(() => {
       aDramaticIronyMusic.play();
-      
+
       // Spawn squares at random places
       for (let i = 0; i <= 30; i++) {
         let size = random([75, 125]);
@@ -1021,6 +1026,8 @@ function displayPlayButton() {
         menuTransition.transitionSound.play();
         player.lives = 5;
         allowButtonClick = false;
+        playADramaticIrony = true;
+        tutorialVariables.tutorialPlayed = false;
       };
     }
   }
@@ -1112,6 +1119,8 @@ function mousePressed() {
     menuTransition.transitionSound.play();
     player.lives = 5;
     allowButtonClick = false;
+    playADramaticIrony = false;
+    tutorialVariables.tutorialPlayed = true;
   }
 }
 
@@ -1236,7 +1245,7 @@ function lives() {
       menuMusic.play();
       menuTransition.levelTransition = false;
       playADramaticIrony = true;
-      tutorialVariables.tutorialPlayed = false;
+      tutorialVariables.tutorialPlayed = true;
       squaresArray = [];
       circlesArray = [];
       for (let timeout of timeouts) {
