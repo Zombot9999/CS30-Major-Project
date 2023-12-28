@@ -203,7 +203,7 @@ class Particle {
 }
 
 // Variables
-let state = "startup";
+let state = "tutorial";
 let allowButtonClick = true;
 let particles = [];
 let lastSpawnTime = 0;
@@ -228,9 +228,12 @@ let playerDead;
 let isScreenWhite = false;
 let tutorialVariables;
 let timeouts = [];
+let jsabFont;
 
 // Load all assets
 function preload() {
+  jsabFont =loadFont("assets/Nexa-Book.ttf");
+
   hourglass = loadImage("assets/hourglass.png");
   
   aDramaticIronyMusic = loadSound("assets/a dramatic irony.mp3");
@@ -266,7 +269,11 @@ function preload() {
   tutorialVariables = {
     music: loadSound("assets/Tutorial Music.mp3"),
     tutorialPlayed: true,
+    text: " ",
+    textXPos: 0,
+    textYPos: 0,
   };
+
   tutorialVariables.music.setVolume(0.3);
 }
 
@@ -326,7 +333,10 @@ function setup() {
   playButton.text = "PLAY";      
   playButton.textColor = "white";   
   playButton.textSize = playButtonVariables.textSize;         
-  playButton.textFont = "times-new-roman"; 
+  playButton.textFont = jsabFont; 
+
+  tutorialVariables.textXPos = width/2;
+  tutorialVariables.textYPos = height/2;
 }
 
 function draw() {
@@ -378,9 +388,18 @@ function draw() {
     displayPlayerAndLives();
     transition();
     move();
+    showInstructions();
     rectMode(CORNER);
     whiteScreen();
   }
+}
+
+function showInstructions() {
+  rectMode(CENTER);
+  textAlign(CENTER);
+  fill(0, 254, 255);
+  textFont(jsabFont, width/40); 
+  text(tutorialVariables.text, tutorialVariables.textXPos, tutorialVariables.textYPos);
 }
 
 function tutorial() {
@@ -392,11 +411,49 @@ function tutorial() {
     setTimeout(() => {
       tutorialVariables.music.play();
 
-      for (let i = 0; i < 5; i++) {
+      // Show move controls coming from the left of the screen
+      tutorialVariables.text = "Use WASD to move.";
+      tutorialVariables.textXPos = 0;
+      for (let i = 0; i <= width/2; i += 1) {
+        timeoutID = setTimeout(() => {
+          tutorialVariables.textXPos = i;
+        }, 0.75 * i);
+        timeouts.push(timeoutID);
+      }
+
+      // Change the instructions to let the player know to dodge pink
+      timeoutID = setTimeout(() => {
+        let change = ["Doe WASD to move.", "Dod WASD to move.", "DodgeASD to move.", "Dodge pi to move.", "Dodge pinto move.", "Dodge pink  move.", "Dodge pink obove.", "Dodge pink obje", "Dodge pink object", "Dodge pink objects."];
+        for (let i = 0; i < 10; i++) {
+          timeoutID = setTimeout(() => {
+            tutorialVariables.text = change[i];
+          }, 50 * i);
+          timeouts.push(timeoutID);
+        }
+      }, 5000);
+      timeouts.push(timeoutID);
+
+      // Send the instructions away
+      timeoutID = setTimeout(() => {
+        for (let i = width/2; i < width * 1.5; i++) {
+          timeoutID = setTimeout(() => {
+            tutorialVariables.textXPos = i;
+          }, 0.75 * i);
+          timeouts.push(timeoutID);
+        }
+      }, 8000);
+      timeouts.push(timeoutID);
+
+      // 4 circles enlarging and disappearing 
+      for (let time of [2000, 3500, 5500, 7000]) {
         let xpos = random(100, width - 100);
         let ypos = random(100, height - 100);
-        circle = new Circles(xpos, ypos, 75, 1, 0, 0, 0, 0, 1000, 750, CORNER, i * 500, "add");
+        circle = new Circles(xpos, ypos, 75, 1, 0, 0, 0, 0, 1000, 750, CORNER, time, "add");
         circlesArray.push(circle);
+        for (let i = 50; i > 0; i--) {
+          circle = new Circles(xpos, ypos, i * 2, 0, 0, 0, 0, 0, 0, 100, CORNER, time + (11 - i) * 10 + 1650, "add");
+          circlesArray.push(circle);
+        }
       }
 
     // Delay everything
@@ -1177,10 +1234,11 @@ function displayPlayerAndLives() {
   if (player.lives !== 99) {
     textAlign(LEFT);
     noStroke();
-    textFont("Courier New", 30);
+    textFont("courier new", 30);
     text("❤︎", 10, 30);
     textStyle(BOLD);
-    text(player.lives, 45, 28);
+    textFont(jsabFont, 30);
+    text(player.lives, 45, 30);
   }
 }
 
