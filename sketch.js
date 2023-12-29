@@ -203,7 +203,7 @@ class Particle {
 }
 
 // Variables
-let state = "tutorial";
+let state = "startup";
 let allowButtonClick = true;
 let particles = [];
 let lastSpawnTime = 0;
@@ -463,6 +463,12 @@ function tutorial() {
         }, i);
         timeouts.push(timeoutID);
       }
+      for (let i = 54000; i <= 90000; i += 500) { 
+        timeoutID = setTimeout(() => {
+          screenShake(5);
+        }, i);
+        timeouts.push(timeoutID);
+      }
 
       // 2 rectangles that are on top and bottom of the screen
       square = new Squares(width, 0, width * 20, height/2 - 50, -0.75, 0, 2000, 1000, CORNER, 8000, 0, -100);
@@ -512,7 +518,7 @@ function tutorial() {
       }
 
       // Extra rectangles going vertically 
-      for (let time of [30000, 34000, 38000, 39000, 40000]) {
+      for (let time of [30000, 34000, 38000, 39000, 54000, 55000, 56000, 56250, 62000, 66000, 70000]) {
         let xpos = random(150, width - 150);
         for (let j = 0; j < 5; j++) {
           square = new Squares(xpos + j * 20, 0, 10, height, 0, 0, 1000 + j * 50, 200, CORNER, time - 1000 + j * 50, 0, 0);
@@ -592,6 +598,85 @@ function tutorial() {
         circle = new Circles(width - height/40, height/20 * i + height/40, height/20, 0, -5, 0, 0, 0, 2000, 10000, CORNER, 50000, "add");
         circlesArray.push(circle);
       }
+
+      // 2 rectangles that are on top and bottom of the screen
+      square = new Squares(width, 0, width * 400, height/2 - height/3, -0.2, 0, 2000, 16000, CORNER, 56000, 0, -100);
+      squaresArray.push(square);
+      square = new Squares(0, 0, width, height/2 - height/3, 0, 0, 2000, 0, CORNER, 56000, 0, 0);
+      squaresArray.push(square);
+      square = new Squares(-(width * 400), height - height/2 + height/3, width * 400, height/2 - height/3, 0.2, 0, 2000, 16000, CORNER, 56000, 0, 100);
+      squaresArray.push(square);
+      square = new Squares(0, height - height/2 + height/3, width, height/2 - height/3, 0, 0, 2000, 0, CORNER, 56000, 0, 0);
+      squaresArray.push(square);
+
+      // 2 vertical rectangles in left and right sides
+      square = new Squares(0, height, width/2 - width/3, 300 * height, 0, -0.2, 2000, 16000, CORNER, 56000, -75, 0);
+      squaresArray.push(square);
+      square = new Squares(0, 0, width/2 - width/3, height, 0, 0, 2000, 0, CORNER, 56000, 0, 0);
+      squaresArray.push(square);
+      square = new Squares(width - width/2 + width/3, -(height * 300), width/2 - width/3, 300 * height, 0, 0.2, 2000, 16000, CORNER, 56000, 75, 0);
+      squaresArray.push(square);
+      square = new Squares(width - width/2 + width/3, 0, width/2 - width/3, height, 0, 0, 2000, 0, CORNER, 56000, 0, 0);
+      squaresArray.push(square);
+
+      for (let i = 59000; i < 90000; i += 500) { 
+        if (random([0, 1]) === 1) {
+          let position = random(height/2 - height/3, height/2 + height/3);
+          square = new Squares(-(width * 10), position, width * 10, 35, 0.2, 0, 2000, 500, CORNER, i - 2000, 0, 75);
+          squaresArray.push(square);
+          square = new Squares(0, position, width, 35, 0, 0, 2000, 0, CORNER, i - 2000, 0, 0);
+          squaresArray.push(square);
+        }
+        else {
+          let position = random(width/2 - width/3, width/2 + width/3);
+          square = new Squares(position, -(height * 20), 35, 20 * height, 0, 0.2, 2000, 1000, CORNER, i - 2000, 75, 0);
+          squaresArray.push(square);
+          square = new Squares(position, 0, 35, height, 0, 0, 2000, 0, CORNER, i - 2000, 0, 0);
+          squaresArray.push(square);
+        }
+      }
+
+      for (let time of [78000, 82000, 86000, 87000, 88000]) { 
+        if (random([0, 1]) === 1) {
+          square = new Squares(-30, 0, 30, height, 0.5, 0, 1000, 15000, CORNER, time - 1000, 0, 10);
+          squaresArray.push(square);
+        }
+        else {
+          square = new Squares(width, 0, 30, height, -0.5, 0, 1000, 15000, CORNER, time - 1000, 0, -10);
+          squaresArray.push(square);
+        }
+      }
+
+      timeoutID = setTimeout(() => {
+        setTimeout(() => {
+          state = "menu";
+          menuBackground.velocityIncrease = 0.1;
+          menuMusic.play();
+          menuTransition.levelTransition = false;
+          playADramaticIrony = true;
+          tutorialVariables.tutorialPlayed = true;
+          squaresArray = [];
+          circlesArray = [];
+
+          for (let timeout of timeouts) {
+            clearTimeout(timeout);
+          }
+
+          menuBackground.velocityIncrease = 0.05;
+          menuBackground.circleCount = 20;
+          player.x = width/2;
+          player.y = height/2;
+        }, menuTransition.transitionTime + 1000);
+    
+        setTimeout(() => {
+          menuTransition.levelTransition = true;
+          menuMusic.stop();
+          menuTransition.transitionSound.play();
+        }, 1000);
+  
+        player.lives = 99;
+      }, 98000);
+      timeouts.push(timeoutID);
 
     // Delay everything
     }, 1000);
@@ -955,6 +1040,37 @@ function aDramaticIrony() {
       squaresArray.push(square);
       square = new Squares(width - (width/2 - 50), 0, width/2 - 50, height, 0, 0, 2000, 0, CORNER, 107500, 0, 0);
       squaresArray.push(square);
+
+      timeoutID = setTimeout(() => {
+        setTimeout(() => {
+          state = "menu";
+          menuBackground.velocityIncrease = 0.1;
+          menuMusic.play();
+          menuTransition.levelTransition = false;
+          playADramaticIrony = true;
+          tutorialVariables.tutorialPlayed = true;
+          squaresArray = [];
+          circlesArray = [];
+
+          for (let timeout of timeouts) {
+            clearTimeout(timeout);
+          }
+
+          menuBackground.velocityIncrease = 0.05;
+          menuBackground.circleCount = 20;
+          player.x = width/2;
+          player.y = height/2;
+        }, menuTransition.transitionTime + 1000);
+    
+        setTimeout(() => {
+          menuTransition.levelTransition = true;
+          menuMusic.stop();
+          menuTransition.transitionSound.play();
+        }, 1000);
+  
+        player.lives = 99;
+      }, 113000);
+      timeouts.push(timeoutID);
 
     // Delay everything
     }, 1000);
