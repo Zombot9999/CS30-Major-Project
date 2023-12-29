@@ -413,8 +413,8 @@ function tutorial() {
 
       // Show move controls coming from the left of the screen
       tutorialVariables.text = "Use WASD to move.";
-      tutorialVariables.textXPos = 0;
-      for (let i = 0; i <= width/2; i += 1) {
+      tutorialVariables.textXPos = -width/2;
+      for (let i = -width/2; i <= width/2; i += 1) {
         timeoutID = setTimeout(() => {
           tutorialVariables.textXPos = i;
         }, 0.75 * i);
@@ -454,6 +454,143 @@ function tutorial() {
           circle = new Circles(xpos, ypos, i * 2, 0, 0, 0, 0, 0, 0, 100, CORNER, time + (11 - i) * 10 + 1650, "add");
           circlesArray.push(circle);
         }
+      }
+
+      // Screenshake
+      for (let i = 10000; i <= 42500; i += 500) { 
+        timeoutID = setTimeout(() => {
+          screenShake(5);
+        }, i);
+        timeouts.push(timeoutID);
+      }
+
+      // 2 rectangles that are on top and bottom of the screen
+      square = new Squares(width, 0, width * 20, height/2 - 50, -0.75, 0, 2000, 1000, CORNER, 8000, 0, -100);
+      squaresArray.push(square);
+      square = new Squares(0, 0, width, height/2 - 50, 0, 0, 2000, 0, CORNER, 8000, 0, 0);
+      squaresArray.push(square);
+      square = new Squares(-(width * 20), height - height/2 + 50, width * 20, height/2 - 50, 0.75, 0, 2000, 1000, CORNER, 8000, 0, 100);
+      squaresArray.push(square);
+      square = new Squares(0, height - height/2 + 50, width, height/2 - 50, 0, 0, 2000, 0, CORNER, 8000, 0, 0);
+      squaresArray.push(square);
+
+      // Rectangles that go from up to down 
+      for (let i = 11000; i < 25000; i += 500) { 
+        let position = random(100, width - 100);
+        square = new Squares(position, -(height * 20), 75, 20 * height, 0, 0.2, 2000, 1000, CORNER, i - 2000, 75, 0);
+        squaresArray.push(square);
+        square = new Squares(position, 0, 75, height, 0, 0, 2000, 0, CORNER, i - 2000, 0, 0);
+        squaresArray.push(square);
+      }
+
+      // Extra rectangles going horizontally 
+      for (let i = 14000; i <= 22000; i += 4000) {
+        let ypos = random(150, height - 150);
+        for (let j = 0; j < 5; j++) {
+          square = new Squares(0, ypos + j * 20, width, 10, 0, 0, 1000 + j * 50, 500, CORNER, i - 1000 + j * 50, 0, 0);
+          squaresArray.push(square);
+        }
+      }
+
+      // 2 vertical rectangles in left and right sides
+      square = new Squares(0, height, width/2 - 100, 20 * height, 0, -0.75, 2000, 1000, CORNER, 24000, -75, 0);
+      squaresArray.push(square);
+      square = new Squares(0, 0, width/2 - 100, height, 0, 0, 2000, 0, CORNER, 24000, 0, 0);
+      squaresArray.push(square);
+      square = new Squares(width - width/2 + 100, -(height * 20), width/2 - 100, 20 * height, 0, 0.75, 2000, 1000, CORNER, 24000, 75, 0);
+      squaresArray.push(square);
+      square = new Squares(width - width/2 + 100, 0, width/2 - 100, height, 0, 0, 2000, 0, CORNER, 24000, 0, 0);
+      squaresArray.push(square);
+
+      // Rectangles that go from left to right 
+      for (let i = 27000; i < 39000; i += 500) { 
+        let position = random(height);
+        square = new Squares(-(width * 10), position, width * 10, 40, 0.2, 0, 2000, 500, CORNER, i - 2000, 0, 75);
+        squaresArray.push(square);
+        square = new Squares(0, position, width, 40, 0, 0, 2000, 0, CORNER, i - 2000, 0, 0);
+        squaresArray.push(square);
+      }
+
+      // Extra rectangles going vertically 
+      for (let time of [30000, 34000, 38000, 39000, 40000]) {
+        let xpos = random(150, width - 150);
+        for (let j = 0; j < 5; j++) {
+          square = new Squares(xpos + j * 20, 0, 10, height, 0, 0, 1000 + j * 50, 200, CORNER, time - 1000 + j * 50, 0, 0);
+          squaresArray.push(square);
+        }
+      }
+
+      // 2 rectangles that are on top and bottom of the screen
+      square = new Squares(width, 0, width * 10, height/2 - 50, -0.2, 0, 3000, 1000, CORNER, 37000, 0, -100);
+      squaresArray.push(square);
+      square = new Squares(0, 0, width, height/2 - 50, 0, 0, 3000, 0, CORNER, 37000, 0, 0);
+      squaresArray.push(square);
+      square = new Squares(-(width * 10), height - height/2 + 50, width * 10, height/2 - 50, 0.2, 0, 3000, 1000, CORNER, 37500, 0, 100);
+      squaresArray.push(square);
+      square = new Squares(0, height - height/2 + 50, width, height/2 - 50, 0, 0, 3000, 0, CORNER, 37500, 0, 0);
+      squaresArray.push(square);
+
+      // 2 vertical rectangles in left and right sides
+      square = new Squares(0, height, width/2 - 100, 20 * height, 0, -0.2, 3000, 1000, CORNER, 39000, -75, 0);
+      squaresArray.push(square);
+      square = new Squares(0, 0, width/2 - 100, height, 0, 0, 3000, 0, CORNER, 39000, 0, 0);
+      squaresArray.push(square);
+      square = new Squares(width - width/2 + 100, -(height * 20), width/2 - 100, 20 * height, 0, 0.2, 3000, 1000, CORNER, 39000, 75, 0);
+      squaresArray.push(square);
+      square = new Squares(width - width/2 + 100, 0, width/2 - 100, height, 0, 0, 3000, 0, CORNER, 39000, 0, 0);
+      squaresArray.push(square);
+
+      // Show dash control 
+      timeoutID = setTimeout(() => {
+        tutorialVariables.text = "You can also dash using the space bar.";
+        tutorialVariables.textXPos = -width/2;
+        for (let i = -width/2; i <= width/2; i += 1) {
+          timeoutID = setTimeout(() => {
+            tutorialVariables.textXPos = i;
+          }, 0.75 * i);
+          timeouts.push(timeoutID);
+        }
+      }, 43000);
+      timeouts.push(timeoutID);
+
+      // Change the instructions
+      timeoutID = setTimeout(() => {
+        let change = ["You can also dash using the space bar.", "Das can also dash using the space bar.", "Dashing w also dash using the space bar.", "Dashing will dash using the space bar.", "Dashing will bri using the space bar.", "Dashing will briefly using the space bar.", "Dashing will briefly make  the space bar.", "Dashing will briefly make you ipace bar.", "Dashing will briefly make you invin bar.", "Dashing will briefly make you invincible."];
+        for (let i = 0; i < 10; i++) {
+          timeoutID = setTimeout(() => {
+            tutorialVariables.text = change[i];
+          }, 50 * i);
+          timeouts.push(timeoutID);
+        }
+      }, 46000);
+      timeouts.push(timeoutID);
+
+      // Change the instructions
+      timeoutID = setTimeout(() => {
+        let change = ["Tryhing will briefly make you invincible.", "Try dag will briefly make you invincible.", "Try dashiill briefly make you invincible.", "Try dashing briefly make you invincible.", "Try dashing threfly make you invincible.", "Try dashing througy make you invincible.", "Try dashing through thke you invincib", "Try dashing through thes you invin", "Try dashing through these you i.", "Try dashing through these."];
+        for (let i = 0; i < 10; i++) {
+          timeoutID = setTimeout(() => {
+            tutorialVariables.text = change[i];
+          }, 50 * i);
+          timeouts.push(timeoutID);
+        }
+      }, 48000);
+      timeouts.push(timeoutID);
+
+      // Send the instructions away
+      timeoutID = setTimeout(() => {
+        for (let i = width/2; i < width * 1.5; i++) {
+          timeoutID = setTimeout(() => {
+            tutorialVariables.textXPos = i;
+          }, 0.75 * i);
+          timeouts.push(timeoutID);
+        }
+      }, 50000);
+      timeouts.push(timeoutID);
+
+      for (let i = 0; i * (height/20) < height; i++) {
+        circle = new Circles(width - height/40, height/20 * i + height/40, height/20, 0, -5, 0, 0, 0, 2000, 10000, CORNER, 50000, "add");
+        circlesArray.push(circle);
       }
 
     // Delay everything
@@ -857,7 +994,7 @@ function screenShake(loopNo) {
   isScreenWhite = true;
   setTimeout(() => {
     isScreenWhite = false;
-  }, 50);
+  }, 25);
 
   // Squares array
   for (let i = squaresArray.length - 1; i >= 0; i--) {
