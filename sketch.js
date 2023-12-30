@@ -511,7 +511,7 @@ function tutorial() {
       // Rectangles that go from left to right 
       for (let i = 27000; i < 39000; i += 500) { 
         let position = random(height);
-        square = new Squares(-(width * 10), position, width * 10, 40, 0.2, 0, 2000, 500, CORNER, i - 2000, 0, 75);
+        square = new Squares(-(width * 5), position, width * 5, 40, 0.2, 0, 2000, 500, CORNER, i - 2000, 0, 75);
         squaresArray.push(square);
         square = new Squares(0, position, width, 40, 0, 0, 2000, 0, CORNER, i - 2000, 0, 0);
         squaresArray.push(square);
@@ -520,8 +520,8 @@ function tutorial() {
       // Extra rectangles going vertically 
       for (let time of [30000, 34000, 38000, 39000, 54000, 55000, 56000, 56250, 62000, 66000, 70000]) {
         let xpos = random(150, width - 150);
-        for (let j = 0; j < 5; j++) {
-          square = new Squares(xpos + j * 20, 0, 10, height, 0, 0, 1000 + j * 50, 200, CORNER, time - 1000 + j * 50, 0, 0);
+        for (let j = 0; j < 7; j++) {
+          square = new Squares(xpos + j * 20, 0, 10, height, 0, 0, 1000 + j * 25, 500, CORNER, time - 1000 + j * 25, 0, 0);
           squaresArray.push(square);
         }
       }
@@ -619,6 +619,7 @@ function tutorial() {
       square = new Squares(width - width/2 + width/3, 0, width/2 - width/3, height, 0, 0, 2000, 0, CORNER, 56000, 0, 0);
       squaresArray.push(square);
 
+      // Rectangles horizontally or vertically until the level ends
       for (let i = 59000; i < 90000; i += 500) { 
         if (random([0, 1]) === 1) {
           let position = random(height/2 - height/3, height/2 + height/3);
@@ -636,6 +637,7 @@ function tutorial() {
         }
       }
 
+      // Rectangles that go across the screen forcing the player to dash
       for (let time of [78000, 82000, 86000, 87000, 88000]) { 
         if (random([0, 1]) === 1) {
           square = new Squares(-30, 0, 30, height, 0.5, 0, 1000, 15000, CORNER, time - 1000, 0, 10);
@@ -647,6 +649,7 @@ function tutorial() {
         }
       }
 
+      // Back to the main menu
       timeoutID = setTimeout(() => {
         setTimeout(() => {
           state = "menu";
@@ -911,7 +914,7 @@ function aDramaticIrony() {
           angleMode(DEGREES);
           let circleAmount = floor(random(10, 25));
           for (let i = 0; i <= 360; i += 360/circleAmount) {
-            circle = new Circles(width + cos(i) - 80, height/2 + sin(i), 10, 0, cos(i), sin(i), 1.005 + k/200, 1.005 + k/200, 0, 20000, CORNER, 65250 + 1000 * k, "multiply");
+            circle = new Circles(width + cos(i) - 50, height/2 + sin(i), 10, 0, cos(i), sin(i), 1.005 + k/200, 1.005 + k/200, 0, 20000, CORNER, 65250 + 1000 * k, "multiply"); 
             circlesArray.push(circle);
           }
         }
@@ -922,7 +925,7 @@ function aDramaticIrony() {
           angleMode(DEGREES);
           let circleAmount = floor(random(10, 25));
           for (let i = 0; i < 360; i += 360/circleAmount) {
-            circle = new Circles(cos(i) + 80, height/2 + sin(i), 10, 0, cos(i), sin(i), 1.005 + k/200, 1.005 + k/200, 0, 20000, CORNER, 65250 + 1000 * k, "multiply");
+            circle = new Circles(cos(i) + 50, height/2 + sin(i), 10, 0, cos(i), sin(i), 1.005 + k/200, 1.005 + k/200, 0, 20000, CORNER, 65250 + 1000 * k, "multiply");
             circlesArray.push(circle);
           }
         }
@@ -1334,7 +1337,7 @@ function displayPlayButton() {
         menuTransition.levelTransition = true;
         menuMusic.stop();
         menuTransition.transitionSound.play();
-        player.lives = 5;
+        player.lives = 98;
         allowButtonClick = false;
         playADramaticIrony = true;
         tutorialVariables.tutorialPlayed = false;
@@ -1427,7 +1430,7 @@ function mousePressed() {
     menuTransition.levelTransition = true;
     menuMusic.stop();
     menuTransition.transitionSound.play();
-    player.lives = 5;
+    player.lives = 98;
     allowButtonClick = false;
     playADramaticIrony = false;
     tutorialVariables.tutorialPlayed = true;
