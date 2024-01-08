@@ -1,4 +1,4 @@
-// Major Project
+// Major Project - JSAB Remade
 // Tareen Perera
 // Nov 21, 2023
 
@@ -229,6 +229,7 @@ let isScreenWhite = false;
 let tutorialVariables;
 let timeouts = [];
 let jsabFont;
+let showGrade = false;
 
 // Load all assets
 function preload() {
@@ -324,6 +325,8 @@ function setup() {
     color: color(0, 254, 255),
     moved: false,
     movement: true,
+    hitsTaken: 0,
+    dashesDone: 0,
   };
   
   playButton.color = "#FC1F66";      
@@ -368,6 +371,7 @@ function draw() {
     lives();
     aDramaticIrony();
     rectMode(CENTER);
+    displayGrade();
     displayPlayerAndLives();
     transition();
     move();
@@ -391,6 +395,38 @@ function draw() {
     showInstructions();
     rectMode(CORNER);
     whiteScreen();
+  }
+}
+
+function displayGrade() {
+  if (showGrade === false) {
+    textAlign(CENTER);
+    fill(player.color);
+    textSize(50);
+    text("Hits taken: " + player.hitsTaken, width/2, height/2 - 75);
+    text("Dashes done: " + player.dashesDone, width/2, height/2);
+    textSize(100);
+
+    if (player.hitsTaken === 0) {
+      fill("gold");
+      text("Grade: S", width/2, height/2 + 100);
+    }
+    else if (player.hitsTaken === 1) {
+      fill("yellow");
+      text("Grade: A+", width/2, height/2 + 100);
+    }
+    else if (player.hitsTaken === 2) {
+      fill("orange");
+      text("Grade: A", width/2, height/2 + 100);
+    }
+    else if (player.hitsTaken === 3) {
+      fill("white");
+      text("Grade: B", width/2, height/2 + 100);
+    }
+    else if (player.hitsTaken >= 4) {
+      fill("red");
+      text("Grade: C", width/2, height/2 + 100);
+    }
   }
 }
 
@@ -1063,6 +1099,7 @@ function aDramaticIrony() {
           menuBackground.circleCount = 20;
           player.x = width/2;
           player.y = height/2;
+          showGrade = false;
         }, menuTransition.transitionTime + 1000);
     
         setTimeout(() => {
@@ -1072,7 +1109,12 @@ function aDramaticIrony() {
         }, 1000);
   
         player.lives = 99;
-      }, 113000);
+      }, 118000);
+      timeouts.push(timeoutID);
+
+      timeoutID = setTimeout(() => {
+        showGrade = true;
+      }, 114000);
       timeouts.push(timeoutID);
 
     // Delay everything
@@ -1180,6 +1222,10 @@ function checkCollision() {
   }
   else {
     player.hit = false;
+  }
+  if (hits > 0 && player.invincible === false) {
+    player.hitsTaken += 1;
+    console.log(player.hitsTaken);
   }
   rectMode(CENTER);
 }
@@ -1341,6 +1387,8 @@ function displayPlayButton() {
         allowButtonClick = false;
         playADramaticIrony = true;
         tutorialVariables.tutorialPlayed = false;
+        player.hitsTaken = 0;
+        player.dashesDone = 0;
       };
     }
   }
@@ -1600,6 +1648,7 @@ function keyPressed() {
     }
 
     player.dashTimer = millis() + player.dashCooldown;
+    player.dashesDone++;
   }
 }
 
