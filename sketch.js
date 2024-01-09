@@ -230,6 +230,7 @@ let tutorialVariables;
 let timeouts = [];
 let jsabFont;
 let showGrade = false;
+let displayGradeVariables;
 
 // Load all assets
 function preload() {
@@ -340,6 +341,12 @@ function setup() {
 
   tutorialVariables.textXPos = width/2;
   tutorialVariables.textYPos = height/2;
+
+  displayGradeVariables = {
+    showGrade: false,
+    yPos: -height,
+    entryAnimation: false,
+  };
 }
 
 function draw() {
@@ -399,34 +406,44 @@ function draw() {
 }
 
 function displayGrade() {
-  if (showGrade === true) {
+  if (displayGradeVariables.showGrade === true) {
     textAlign(CENTER);
     fill(player.color);
     textSize(50);
-    text("Hits taken: " + player.hitsTaken, width/2, height/2 - 75);
-    text("Dashes done: " + player.dashesDone, width/2, height/2);
+    text("Hits taken: " + player.hitsTaken, width/2, displayGradeVariables.yPos - 75);
+    text("Dashes done: " + player.dashesDone, width/2, displayGradeVariables.yPos);
     textSize(100);
 
     if (player.hitsTaken === 0) {
       fill("gold");
-      text("Grade: S", width/2, height/2 + 100);
+      text("Rank: S", width/2, displayGradeVariables.yPos + 100);
     }
     else if (player.hitsTaken === 1) {
       fill("yellow");
-      text("Grade: A+", width/2, height/2 + 100);
+      text("Rank: A+", width/2, displayGradeVariables.yPos + 100);
     }
     else if (player.hitsTaken === 2) {
       fill("orange");
-      text("Grade: A", width/2, height/2 + 100);
+      text("Rank: A", width/2, displayGradeVariables.yPos + 100);
     }
     else if (player.hitsTaken === 3) {
       fill("white");
-      text("Grade: B", width/2, height/2 + 100);
+      text("Rank: B", width/2, displayGradeVariables.yPos + 100);
     }
     else if (player.hitsTaken >= 4) {
       fill("red");
-      text("Grade: C", width/2, height/2 + 100);
+      text("Rank: C", width/2, displayGradeVariables.yPos + 100);
     }
+
+    if (displayGradeVariables.entryAnimation === true) {
+      displayGradeVariables.entryAnimation = false;
+      for (let i = -height; i < height/2; i++) {
+        setTimeout(() => {
+          displayGradeVariables.yPos = i;
+        }, 10 * i);
+      }
+    }
+
   }
 }
 
@@ -1099,7 +1116,8 @@ function aDramaticIrony() {
           menuBackground.circleCount = 20;
           player.x = width/2;
           player.y = height/2;
-          showGrade = false;
+          displayGradeVariables.showGrade = false;
+          displayGradeVariables.entryAnimation = false;
         }, menuTransition.transitionTime + 1000);
     
         setTimeout(() => {
@@ -1107,14 +1125,14 @@ function aDramaticIrony() {
           menuMusic.stop();
           menuTransition.transitionSound.play();
         }, 1000);
-  
         player.lives = 99;
       }, 118000);
       timeouts.push(timeoutID);
 
       timeoutID = setTimeout(() => {
-        showGrade = true;
-      }, 114000);
+        displayGradeVariables.showGrade = true;
+        displayGradeVariables.entryAnimation = true;
+      }, 2000);
       timeouts.push(timeoutID);
 
     // Delay everything
@@ -1222,10 +1240,6 @@ function checkCollision() {
   }
   else {
     player.hit = false;
-  }
-  if (hits > 0 && player.invincible === false) {
-    player.hitsTaken += 1;
-    console.log(player.hitsTaken);
   }
   rectMode(CENTER);
 }
@@ -1566,6 +1580,7 @@ function lives() {
       aHeld = true;
     }
     player.lives -= 1;
+    player.hitsTaken += 1;
     playerHit.play();
     player.invincible = true;
     player.iFrameTimer = millis() + 2500;
