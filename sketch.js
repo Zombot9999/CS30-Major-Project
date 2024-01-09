@@ -399,7 +399,7 @@ function draw() {
 }
 
 function displayGrade() {
-  if (showGrade === false) {
+  if (showGrade === true) {
     textAlign(CENTER);
     fill(player.color);
     textSize(50);
