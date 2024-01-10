@@ -231,6 +231,7 @@ let timeouts = [];
 let jsabFont;
 let showGrade = false;
 let displayGradeVariables;
+let stars = 0;
 
 // Load all assets
 function preload() {
@@ -437,13 +438,12 @@ function displayGrade() {
 
     if (displayGradeVariables.entryAnimation === true) {
       displayGradeVariables.entryAnimation = false;
-      for (let i = -height; i < height/2; i++) {
+      for (let i = -height; i < height/2; i += 5) {
         setTimeout(() => {
           displayGradeVariables.yPos = i;
-        }, 10 * i);
+        }, i);
       }
     }
-
   }
 }
 
@@ -1050,9 +1050,9 @@ function aDramaticIrony() {
       // 4 rectangles going top to bottom
       for (let i = 1; i < 5; i++) { 
         let xpos = (width/4 - 100) * i;
-        square = new Squares(xpos, -(height * 120), 200, 120 * height, 0, 0.2, 2000, 1000, CORNER, 87000 + 1000 * i, 75, 0); 
+        square = new Squares(xpos, -(height * 20), 200, 20 * height, 0, 0.2, 2000, 1000, CORNER, 87000 + 1000 * i, 75, 0); 
         squaresArray.push(square);
-        square = new Squares(xpos, 0, 200, height, 0, 0, 2500, 0, CORNER, 87000 + 950 * i, 0, 0);
+        square = new Squares(xpos, 0, 200, height, 0, 0, 2500, 0, CORNER, 87000 + 950 * i, 0, 0); 
         squaresArray.push(square);
         
         timeoutID = setTimeout(() => {
@@ -1132,7 +1132,7 @@ function aDramaticIrony() {
       timeoutID = setTimeout(() => {
         displayGradeVariables.showGrade = true;
         displayGradeVariables.entryAnimation = true;
-      }, 2000);
+      }, 114000);
       timeouts.push(timeoutID);
 
     // Delay everything
@@ -1590,16 +1590,16 @@ function lives() {
       setTimeout(() => {
         player.movement = false;
         if (dHeld) {
-          player.x -= player.dx;
+          player.x -= 5;
         }
         if (aHeld) {
-          player.x += player.dx;
+          player.x += 5;
         }
         if (sHeld) {
-          player.y -= player.dy;
+          player.y -= 5;
         }
         if (wHeld) {
-          player.y += player.dx;
+          player.y += 5;
         }
         player.movement = true;
       }, 5 * i);
@@ -1663,7 +1663,9 @@ function keyPressed() {
     }
 
     player.dashTimer = millis() + player.dashCooldown;
-    player.dashesDone++;
+    if (displayGradeVariables.showGrade === false) {
+      player.dashesDone++;
+    }
   }
 }
 
