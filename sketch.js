@@ -1080,22 +1080,27 @@ function aDramaticIrony() {
       }
 
       // Force player into a small area in the middle
-      square = new Squares(-(width*80), 0, width * 80, height/2 - 50, 0.2, 0, 2000, 7000, CORNER, 104500, 0, 75); 
+      square = new Squares(width, 0, width * 80, height/2 - 250, -0.2, 0, 2000, 7000, CORNER, 4500, 0, -75); 
       squaresArray.push(square);
-      square = new Squares(0, 0, width, height/2 - 50, 0, 0, 2000, 0, CORNER, 104500, 0, 0);
+      square = new Squares(0, 0, width, height/2 - 250, 0, 0, 2000, 0, CORNER, 4500, 0, 0);
       squaresArray.push(square);
-      square = new Squares(-(width*80), height/2 + 50, width * 80, height/2, 0.2, 0, 2000, 6000, CORNER, 105500, 0, 75); 
+      square = new Squares(-(width*80), height/2 + 250, width * 80, height/2, 0.2, 0, 2000, 6000, CORNER, 4500, 0, 75); 
       squaresArray.push(square);
-      square = new Squares(0, height/2 + 50, width, height/2, 0, 0, 2000, 0, CORNER, 105500, 0, 0);
+      square = new Squares(0, height/2 + 250, width, height/2, 0, 0, 2000, 0, CORNER, 4500, 0, 0); //104500
       squaresArray.push(square);
-      square = new Squares(0, -(height * 80), width/2- 50, 80 * height, 0, 0.2, 2000, 5000, CORNER, 106500, 75, 0);
+      square = new Squares(0, -(height * 80), width/2- 250, 80 * height, 0, 0.2, 2000, 5000, CORNER, 5500, 75, 0);
       squaresArray.push(square);
-      square = new Squares(0, 0, width/2 - 50, height, 0, 0, 2000, 0, CORNER, 106500, 0, 0);
+      square = new Squares(0, 0, width/2 - 250, height, 0, 0, 2000, 0, CORNER, 5500, 0, 0);
       squaresArray.push(square);
-      square = new Squares(width - (width/2 - 50), -(height * 80), width/2 - 50, 80 * height, 0, 0.2, 2000, 4000, CORNER, 107500, 75, 0);
+      square = new Squares(width - (width/2 - 250), -(height * 80), width/2 - 250, 80 * height, 0, 0.2, 2000, 4000, CORNER, 5500, 75, 0);
       squaresArray.push(square);
-      square = new Squares(width - (width/2 - 50), 0, width/2 - 50, height, 0, 0, 2000, 0, CORNER, 107500, 0, 0);
+      square = new Squares(width - (width/2 - 250), 0, width/2 - 250, height, 0, 0, 2000, 0, CORNER, 5500, 0, 0); //105500
       squaresArray.push(square);
+
+      for (let i = 0; i < floor(width/100); i++) {
+        square = new Squares(i * 100 + 50, 0, 100, height, 0, 0, 2000, 500, CORNER, 4500, 0, 0);
+        squaresArray.push(square);
+      }
 
       timeoutID = setTimeout(() => {
         setTimeout(() => {
