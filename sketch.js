@@ -23,6 +23,7 @@ class Squares {
     this.timeout = timeout;
   }
 
+  // Display the squares
   display() {
     if (millis() > this.timeoutStart + this.timeout) {
       rectMode(this.rectModeVariable);
@@ -57,6 +58,7 @@ class Squares {
     }
   }
 
+  // Update the square's x, y and alpha
   update() {
     if (millis() > this.timeoutStart + this.timeout) {
       if (this.warningStart + this.warningTime > millis() && (this.dyIncrease === 0 || this.dxIncrease === 0)) {
@@ -105,6 +107,7 @@ class Circles {
     this.velocityApply = velocityApply;
   }
 
+  // Display the circles
   display() {
     if (millis() > this.timeoutStart + this.timeout) {
       rectMode(this.rectModeVariable);
@@ -138,6 +141,7 @@ class Circles {
     }
   }
 
+  // Update the circle's alpha, x, y and radius
   update() {
     if (millis() > this.timeoutStart + this.timeout) {
       if (this.warningStart + this.warningTime > millis()) {
@@ -356,6 +360,12 @@ function setup() {
     starsEarned: 0,
     starsDisplay: 0,
   };
+
+  // Get the previous amount of stars the user had
+  stars = getItem("stars");
+  if (stars === null) {
+    stars = 0;
+  }
 }
 
 function draw() {
@@ -396,6 +406,7 @@ function draw() {
     whiteScreen();
   }
 
+  // Tutorial level
   else if (state === "tutorial") {
     background(23, 17, 28);
     checkCollision();
@@ -407,14 +418,15 @@ function draw() {
     tutorial();
     rectMode(CENTER);
     displayPlayerAndLives();
+    showInstructions();
     transition();
     move();
-    showInstructions();
     rectMode(CORNER);
     whiteScreen();
   }
 }
 
+// Show the amoung of stars the player has on the main menu
 function displayStars() {
   textAlign(RIGHT);
   fill("gold");
@@ -425,6 +437,7 @@ function displayStars() {
   textSize(100);
 }
 
+// Display the player's stats after the level
 function displayGrade() {
   if (displayGradeVariables.showGrade === true) {
     textAlign(CENTER);
@@ -475,6 +488,7 @@ function displayGrade() {
     }
     text("Rank: "+ player.rank, width/2, displayGradeVariables.yPos + 100);
 
+    // Entering animation for the text
     if (displayGradeVariables.entryAnimation === true) {
       displayGradeVariables.entryAnimation = false;
       for (let i = -height; i < height/2; i += 5) {
@@ -489,23 +503,31 @@ function displayGrade() {
         }, i);
       }
 
+      // Animate the star count
       for (let i = 0; i < displayGradeVariables.starsEarned; i += 1) {
         setTimeout(() => {
           displayGradeVariables.starsDisplay++;
-        }, 40 * i + 250);
+        }, 40 * i + 500);
       }
     }
   }
 }
 
+// Show the instructions using the variables
 function showInstructions() {
   rectMode(CENTER);
   textAlign(CENTER);
   fill(0, 254, 255);
   textFont(jsabFont, width/40); 
   text(tutorialVariables.text, tutorialVariables.textXPos, tutorialVariables.textYPos);
+
+  // Always show this bit of instructions in the tutorial
+  textAlign(CORNER);
+  textFont(jsabFont, width/80); 
+  text("Note: Transparent pink will warn you of incoming danger zones but will not damage you; Try to avoid them.", 10, height - width/80);
 }
 
+// Tutorial level
 function tutorial() {
   if (tutorialVariables.tutorialPlayed === true) {
     let circle;
@@ -1148,6 +1170,7 @@ function aDramaticIrony() {
       square = new Squares(width - (width/2 - 250), 0, width/2 - 250, height, 0, 0, 2000, 0, CORNER, 105500, 0, 0); 
       squaresArray.push(square);
 
+      // Columns of rectangles
       for (let i = 0; i < floor(width/100); i++) {
         if (i % 2 === 0) {
           square = new Squares(i * 100, 0, 100, height, 0, 0, 1000, 650, CORNER, 107500, 0, 0);
@@ -1159,6 +1182,7 @@ function aDramaticIrony() {
         }
       }
 
+      // Send the player back to the menu
       timeoutID = setTimeout(() => {
         setTimeout(() => {
           state = "menu";
@@ -1194,6 +1218,7 @@ function aDramaticIrony() {
       }, 118000);
       timeouts.push(timeoutID);
 
+      // Allow displayGrade() to function and set the player ranks
       timeoutID = setTimeout(() => {
         if (player.hitsTaken === 0) {
           player.rank = "S";
@@ -1220,6 +1245,7 @@ function aDramaticIrony() {
           stars += 3;
           displayGradeVariables.starsEarned = 3;
         }
+        storeItem("stars", stars);
 
         displayGradeVariables.showGrade = true;
         displayGradeVariables.entryAnimation = true;
@@ -1233,6 +1259,7 @@ function aDramaticIrony() {
   }
 }
 
+// Go through the array of squares and display all of them
 function showSquares() {
   for (let i = squaresArray.length - 1; i >= 0; i--) {
     squaresArray[i].display();
@@ -1243,6 +1270,7 @@ function showSquares() {
   }
 }
 
+// Go through the array of circles and display all of them
 function showCircles() {
   for (let i = circlesArray.length - 1; i >= 0; i--) {
     circlesArray[i].display();
@@ -1253,6 +1281,7 @@ function showCircles() {
   }
 }
 
+// Brief white screen
 function whiteScreen() {
   if (isScreenWhite) {
     rectMode(CORNER);
@@ -1261,6 +1290,7 @@ function whiteScreen() {
   }
 }
 
+// Change y values of all squares, circles and player to make it look like a screenshake
 function screenShake(loopNo) {
   isScreenWhite = true;
   setTimeout(() => {
@@ -1314,6 +1344,7 @@ function screenShake(loopNo) {
   }, loopNo * 20/2);
 }
 
+// Collision check using collide2D
 function checkCollision() {
   rectMode(CORNER);
   let hits = 0;
@@ -1336,21 +1367,23 @@ function checkCollision() {
   rectMode(CENTER);
 }
 
+// Transition screen between menu and levels
 function transition() {
   rectMode(CENTER);
-  fill(27, 17, 28);
+  // fill(27, 17, 28);
+  fill("black");
   noStroke();
   rect(width/2, height/2, width, menuTransition.rectHeight);
   if (menuTransition.levelTransition === true) {
-    for (let i = 0; i <= 200; i++) {
+    for (let i = 0; i <= 225; i++) {
       setTimeout(() => {
         menuTransition.rectHeight = map(i, 0, 200, 0, height);
       }, 5 * i);
     }
-    for (let i = 200; i >= 0; i--) {
+    for (let i = 225; i >= 0; i--) {
       setTimeout(() => {
         menuTransition.rectHeight = map(i, 0, 200, 0, height);
-      }, 5 * (200 - i) + 1000);
+      }, 5 * (225 - i) + 1000);
     }
     menuTransition.levelTransition = "waiting...";
   }
@@ -1574,6 +1607,7 @@ function displayLogoAndMusic() {
   text("?", 10, 20, 75, 75);
 }
 
+// If the player clicks on the question mark button, start the tutorial
 function mousePressed() {
   if (mouseX < 85 && mouseY < 85 && allowButtonClick === true && state === "menu") {
     setTimeout(() => {
@@ -1591,6 +1625,7 @@ function mousePressed() {
   }
 }
 
+// Show particles on the player
 function showParticles() {
   rectMode(CENTER);
   if (millis() - lastSpawnTime > spawnInterval) {
@@ -1608,6 +1643,7 @@ function showParticles() {
   }
 }
 
+// Player can't go outside the window
 function playerBorders() {
   // Right border
   if (player.x + player.nonStretchedSize/2 > width) { 
@@ -1627,6 +1663,7 @@ function playerBorders() {
   }
 }
 
+// Show the player and lives
 function displayPlayerAndLives() {
   // Display player
   noStroke();
@@ -1697,12 +1734,18 @@ function lives() {
       }, 5 * i);
     }
   }
+  
+  // If invincible
   if (player.invincible) {
     image(hourglass, player.x, player.y - player.nonStretchedSize - 5, player.stretchedMin, player.stretchedMin);
   }
+
+  // Remove invincibility after some time
   if (millis() > player.iFrameTimer) {
     player.invincible = false;
   }
+
+  // If the player runs out of lives
   if (player.lives <= 0) {
     playerDead.play();
     aDramaticIronyMusic.stop();
