@@ -232,6 +232,7 @@ let jsabFont;
 let showGrade = false;
 let displayGradeVariables;
 let stars = 0;
+let winSound;
 
 // Load all assets
 function preload() {
@@ -278,6 +279,9 @@ function preload() {
   };
 
   tutorialVariables.music.setVolume(0.3);
+
+  winSound = loadSound("assets/win.mp3");
+  winSound.setVolume(0.3);
 }
 
 // Setup the variables and modes
@@ -329,6 +333,7 @@ function setup() {
     movement: true,
     hitsTaken: 0,
     dashesDone: 0,
+    rank: "none",
   };
   
   playButton.color = "#FC1F66";      
@@ -347,6 +352,9 @@ function setup() {
     showGrade: false,
     yPos: -height,
     entryAnimation: false,
+    starCountXPos: width + 100,
+    starsEarned: 0,
+    starsDisplay: 0,
   };
 }
 
@@ -365,6 +373,7 @@ function draw() {
     showPlayButton();
     displayLogoAndMusic();
     displayPlayButton();
+    displayStars();
     transition();
   }
 
@@ -406,6 +415,16 @@ function draw() {
   }
 }
 
+function displayStars() {
+  textAlign(RIGHT);
+  fill("gold");
+  textSize(50);
+  text("🌟", width - 110, 55);
+  textFont(jsabFont);
+  text(stars, width - 30, 50);
+  textSize(100);
+}
+
 function displayGrade() {
   if (displayGradeVariables.showGrade === true) {
     textAlign(CENTER);
@@ -415,26 +434,46 @@ function displayGrade() {
     text("Dashes done: " + player.dashesDone, width/2, displayGradeVariables.yPos);
     textSize(100);
 
-    if (player.hitsTaken === 0) {
+    if (player.rank === "S") {
       fill("gold");
-      text("Rank: S", width/2, displayGradeVariables.yPos + 100);
+      textFont("georgia");
+      text("🌟", displayGradeVariables.starCountXPos - 75, height - 100);
+      textFont(jsabFont);
+      text("+" + displayGradeVariables.starsDisplay, displayGradeVariables.starCountXPos + 75, height - 100);
     }
-    else if (player.hitsTaken === 1) {
+    else if (player.rank === "A+") {
+      fill("gold");
+      textFont("georgia");
+      text("🌟", displayGradeVariables.starCountXPos - 75, height - 100);
+      textFont(jsabFont);
+      text("+" + displayGradeVariables.starsDisplay, displayGradeVariables.starCountXPos + 75, height - 100);
       fill("yellow");
-      text("Rank: A+", width/2, displayGradeVariables.yPos + 100);
     }
-    else if (player.hitsTaken === 2) {
+    else if (player.rank === "A") {
+      fill("gold");
+      textFont("georgia");
+      text("🌟", displayGradeVariables.starCountXPos - 75, height - 100);
+      textFont(jsabFont);
+      text("+" + displayGradeVariables.starsDisplay, displayGradeVariables.starCountXPos + 75, height - 100);
       fill("orange");
-      text("Rank: A", width/2, displayGradeVariables.yPos + 100);
     }
-    else if (player.hitsTaken === 3) {
+    else if (player.rank === "B") {
+      fill("gold");
+      textFont("georgia");
+      text("🌟", displayGradeVariables.starCountXPos - 75, height - 100);
+      textFont(jsabFont);
+      text("+" + displayGradeVariables.starsDisplay, displayGradeVariables.starCountXPos + 75, height - 100);
       fill("white");
-      text("Rank: B", width/2, displayGradeVariables.yPos + 100);
     }
-    else if (player.hitsTaken >= 4) {
+    else if (player.rank === "C") {
+      fill("gold");
+      textFont("georgia");
+      text("🌟", displayGradeVariables.starCountXPos - 60, height - 100);
+      textFont(jsabFont);
+      text("+" + displayGradeVariables.starsDisplay, displayGradeVariables.starCountXPos + 60, height - 100);
       fill("red");
-      text("Rank: C", width/2, displayGradeVariables.yPos + 100);
     }
+    text("Rank: "+ player.rank, width/2, displayGradeVariables.yPos + 100);
 
     if (displayGradeVariables.entryAnimation === true) {
       displayGradeVariables.entryAnimation = false;
@@ -442,6 +481,18 @@ function displayGrade() {
         setTimeout(() => {
           displayGradeVariables.yPos = i;
         }, i);
+      }
+
+      for (let i = 0; i < 250; i += 1) {
+        setTimeout(() => {
+          displayGradeVariables.starCountXPos -= 1.1;
+        }, i);
+      }
+
+      for (let i = 0; i < displayGradeVariables.starsEarned; i += 1) {
+        setTimeout(() => {
+          displayGradeVariables.starsDisplay++;
+        }, 40 * i + 250);
       }
     }
   }
@@ -999,14 +1050,14 @@ function aDramaticIrony() {
       circle = new Circles(width/2, height/2, 5, 0.5, 0, 0, 0, 0, 500, 8250, CORNER, 75000, "add");
       circlesArray.push(circle);
       for (let i = 0; i < 1440; i += 360/30) {
-        circle = new Circles(width/2 + cos(i), height/2 + sin(i), 2, 0.1, cos(i), sin(i), 1.005, 1.005, 0, 20000, CORNER, i/30*100 + 75000, "multiply");
+        circle = new Circles(width/2 + cos(i), height/2 + sin(i), 2, 0.1, cos(i), sin(i), 1.005, 1.005, 0, 10000, CORNER, i/30*100 + 75000, "multiply");
         circlesArray.push(circle);
       }
       angleMode(DEGREES);
       for (let j = 0; j < 20; j++) {
         let circleAmount = floor(random(5, 20));
         for (let i = 360/circleAmount; i < 360; i += 360/circleAmount) {
-          circle = new Circles(width/2 + cos(i), height/2 + sin(i), 7, 0, cos(i), sin(i), 1.005+j/1000, 1.005+j/1000, 0, 7500, CORNER, 83750, "multiply");
+          circle = new Circles(width/2 + cos(i), height/2 + sin(i), 7, 0, cos(i), sin(i), 1.005+j/1000, 1.005+j/1000, 0, 5000, CORNER, 83750, "multiply");
           circlesArray.push(circle);
         }
       }
@@ -1080,26 +1131,32 @@ function aDramaticIrony() {
       }
 
       // Force player into a small area in the middle
-      square = new Squares(width, 0, width * 80, height/2 - 250, -0.2, 0, 2000, 7000, CORNER, 4500, 0, -75); 
+      square = new Squares(width, 0, width * 80, height/2 - 150, -0.2, 0, 2000, 7000, CORNER, 104500, 0, -75); 
       squaresArray.push(square);
-      square = new Squares(0, 0, width, height/2 - 250, 0, 0, 2000, 0, CORNER, 4500, 0, 0);
+      square = new Squares(0, 0, width, height/2 - 150, 0, 0, 2000, 0, CORNER, 104500, 0, 0);
       squaresArray.push(square);
-      square = new Squares(-(width*80), height/2 + 250, width * 80, height/2, 0.2, 0, 2000, 6000, CORNER, 4500, 0, 75); 
+      square = new Squares(-(width*80), height/2 + 150, width * 80, height/2, 0.2, 0, 2000, 7000, CORNER, 104500, 0, 75); 
       squaresArray.push(square);
-      square = new Squares(0, height/2 + 250, width, height/2, 0, 0, 2000, 0, CORNER, 4500, 0, 0); //104500
+      square = new Squares(0, height/2 + 150, width, height/2, 0, 0, 2000, 0, CORNER, 104500, 0, 0); 
       squaresArray.push(square);
-      square = new Squares(0, -(height * 80), width/2- 250, 80 * height, 0, 0.2, 2000, 5000, CORNER, 5500, 75, 0);
+      square = new Squares(0, -(height * 80), width/2- 250, 80 * height, 0, 0.2, 2000, 6000, CORNER, 105500, 75, 0);
       squaresArray.push(square);
-      square = new Squares(0, 0, width/2 - 250, height, 0, 0, 2000, 0, CORNER, 5500, 0, 0);
+      square = new Squares(0, 0, width/2 - 250, height, 0, 0, 2000, 0, CORNER, 105500, 0, 0);
       squaresArray.push(square);
-      square = new Squares(width - (width/2 - 250), -(height * 80), width/2 - 250, 80 * height, 0, 0.2, 2000, 4000, CORNER, 5500, 75, 0);
+      square = new Squares(width - (width/2 - 250), -(height * 80), width/2 - 250, 80 * height, 0, 0.2, 2000, 6000, CORNER, 105500, 75, 0);
       squaresArray.push(square);
-      square = new Squares(width - (width/2 - 250), 0, width/2 - 250, height, 0, 0, 2000, 0, CORNER, 5500, 0, 0); //105500
+      square = new Squares(width - (width/2 - 250), 0, width/2 - 250, height, 0, 0, 2000, 0, CORNER, 105500, 0, 0); 
       squaresArray.push(square);
 
       for (let i = 0; i < floor(width/100); i++) {
-        square = new Squares(i * 100 + 50, 0, 100, height, 0, 0, 2000, 500, CORNER, 4500, 0, 0);
-        squaresArray.push(square);
+        if (i % 2 === 0) {
+          square = new Squares(i * 100, 0, 100, height, 0, 0, 1000, 650, CORNER, 107500, 0, 0);
+          squaresArray.push(square);
+        }
+        else {
+          square = new Squares(i * 100, 0, 100, height, 0, 0, 1500, 500, CORNER, 108000, 0, 0);
+          squaresArray.push(square);
+        }
       }
 
       timeoutID = setTimeout(() => {
@@ -1123,6 +1180,9 @@ function aDramaticIrony() {
           player.y = height/2;
           displayGradeVariables.showGrade = false;
           displayGradeVariables.entryAnimation = false;
+          displayGradeVariables.starsDisplay = 0;
+          displayGradeVariables.starCountXPos = width + 100;
+          displayGradeVariables.yPos = -height;
         }, menuTransition.transitionTime + 1000);
     
         setTimeout(() => {
@@ -1135,9 +1195,36 @@ function aDramaticIrony() {
       timeouts.push(timeoutID);
 
       timeoutID = setTimeout(() => {
+        if (player.hitsTaken === 0) {
+          player.rank = "S";
+          stars += 30;
+          displayGradeVariables.starsEarned = 30;
+        }
+        else if (player.hitsTaken === 1) {
+          player.rank = "A+";
+          stars += 25;
+          displayGradeVariables.starsEarned = 25;
+        }
+        else if (player.hitsTaken === 2) {
+          player.rank = "A";
+          stars += 20;
+          displayGradeVariables.starsEarned = 20;
+        }
+        else if (player.hitsTaken === 3) {
+          player.rank = "B";
+          stars += 10;
+          displayGradeVariables.starsEarned = 10;
+        }
+        else if (player.hitsTaken >= 4) {
+          player.rank = "C";
+          stars += 3;
+          displayGradeVariables.starsEarned = 3;
+        }
+
         displayGradeVariables.showGrade = true;
         displayGradeVariables.entryAnimation = true;
-      }, 114000);
+        winSound.play(); 
+      }, 114000); 
       timeouts.push(timeoutID);
 
     // Delay everything

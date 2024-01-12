@@ -12,7 +12,7 @@ My Project will be an improvement of the grid assignment where the player is abl
 - At least 1 level ✓
 - Different attacks happening as time goes on ✓
 - Grading system where the player gets a rating on how well they did ✓
-- A currency the player gets when they win
+- A currency the player gets when they win ✓
 - Sound effects ✓
 - Music that goes with the attacks ✓
 
