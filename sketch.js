@@ -237,6 +237,7 @@ let showGrade = false;
 let displayGradeVariables;
 let stars = 0;
 let winSound;
+let progressBar;
 
 // Load all assets
 function preload() {
@@ -366,6 +367,13 @@ function setup() {
   if (stars === null) {
     stars = 0;
   }
+
+  progressBar = {
+    width: width/1.2,
+    progress: 0,
+    duration: 139000,
+    levelStartedAt: 0,
+  };
 }
 
 function draw() {
@@ -400,6 +408,7 @@ function draw() {
     rectMode(CENTER);
     displayGrade();
     displayPlayerAndLives();
+    displayProgressBar();
     transition();
     move();
     rectMode(CORNER);
@@ -419,11 +428,24 @@ function draw() {
     rectMode(CENTER);
     displayPlayerAndLives();
     showInstructions();
+    displayProgressBar();
     transition();
     move();
     rectMode(CORNER);
     whiteScreen();
   }
+}
+
+function displayProgressBar() {
+  rectMode(CORNER);
+  fill(33, 78, 81, 100);
+  rect(width/2 - progressBar.width/2, 50, progressBar.width, 10);
+
+  progressBar.progress = map(millis() - progressBar.levelStartedAt, 0, progressBar.duration, 0, 1); 
+  progressBar.progress = constrain(progressBar.progress, 0, 1);
+
+  fill(player.color, 100);
+  rect(width / 2 - progressBar.width / 2, 50, progressBar.progress * progressBar.width, 10);
 }
 
 // Show the amoung of stars the player has on the main menu
@@ -524,7 +546,7 @@ function showInstructions() {
   // Always show this bit of instructions in the tutorial
   textAlign(CORNER);
   textFont(jsabFont, width/80); 
-  text("Note: Transparent pink will warn you of incoming danger zones but will not damage you; Try to avoid them.", 10, height - width/80);
+  text("Tip: Transparent pink will warn you of incoming danger zones but will not damage you; Try to avoid them.", 10, height - width/80);
 }
 
 // Tutorial level
@@ -533,6 +555,9 @@ function tutorial() {
     let circle;
     let square;
     let timeoutID;
+    progressBar.levelStartedAt = millis();
+    progressBar.duration = 99000;
+    progressBar.progress = 0;
 
     setTimeout(() => {
       tutorialVariables.music.play();
@@ -636,11 +661,20 @@ function tutorial() {
 
       // Rectangles that go from left to right 
       for (let i = 27000; i < 39000; i += 500) { 
-        let position = random(height);
-        square = new Squares(-(width * 5), position, width * 5, 40, 0.2, 0, 2000, 500, CORNER, i - 2000, 0, 75);
-        squaresArray.push(square);
-        square = new Squares(0, position, width, 40, 0, 0, 2000, 0, CORNER, i - 2000, 0, 0);
-        squaresArray.push(square);
+        if (random([1, 2]) === 1) {
+          let position = random(height);
+          square = new Squares(-(width * 4), position, width * 4, 40, 0.2, 0, 2000, 500, CORNER, i - 2000, 0, 75);
+          squaresArray.push(square);
+          square = new Squares(0, position, width, 40, 0, 0, 2000, 0, CORNER, i - 2000, 0, 0);
+          squaresArray.push(square);
+        }
+        else {
+          let position = random(height);
+          square = new Squares(width, position, width * 4, 40, -0.2, 0, 2000, 500, CORNER, i - 2000, 0, -75);
+          squaresArray.push(square);
+          square = new Squares(0, position, width, 40, 0, 0, 2000, 0, CORNER, i - 2000, 0, 0);
+          squaresArray.push(square);
+        }
       }
 
       // Extra rectangles going vertically 
@@ -653,7 +687,7 @@ function tutorial() {
       }
 
       // 2 rectangles that are on top and bottom of the screen
-      square = new Squares(width, 0, width * 10, height/2 - 50, -0.2, 0, 3000, 1000, CORNER, 37000, 0, -100);
+      square = new Squares(width, 0, width * 10, height/2 - 50, -0.2, 0, 3000, 1500, CORNER, 37000, 0, -100);
       squaresArray.push(square);
       square = new Squares(0, 0, width, height/2 - 50, 0, 0, 3000, 0, CORNER, 37000, 0, 0);
       squaresArray.push(square);
@@ -749,7 +783,7 @@ function tutorial() {
       for (let i = 59000; i < 90000; i += 500) { 
         if (random([0, 1]) === 1) {
           let position = random(height/2 - height/3, height/2 + height/3);
-          square = new Squares(-(width * 10), position, width * 10, 35, 0.2, 0, 2000, 500, CORNER, i - 2000, 0, 75);
+          square = new Squares(-(width * 4), position, width * 4, 35, 0.2, 0, 2000, 500, CORNER, i - 2000, 0, 75);
           squaresArray.push(square);
           square = new Squares(0, position, width, 35, 0, 0, 2000, 0, CORNER, i - 2000, 0, 0);
           squaresArray.push(square);
@@ -818,6 +852,9 @@ function aDramaticIrony() {
     let square;
     let circle;
     let timeoutID;
+    progressBar.levelStartedAt = millis();
+    progressBar.duration = 115000;
+    progressBar.progress = 0;
 
     setTimeout(() => {
       aDramaticIronyMusic.play();
@@ -1522,7 +1559,7 @@ function displayPlayButton() {
         menuTransition.levelTransition = true;
         menuMusic.stop();
         menuTransition.transitionSound.play();
-        player.lives = 98;
+        player.lives = 5;
         allowButtonClick = false;
         playADramaticIrony = true;
         tutorialVariables.tutorialPlayed = false;
@@ -1618,7 +1655,7 @@ function mousePressed() {
     menuTransition.levelTransition = true;
     menuMusic.stop();
     menuTransition.transitionSound.play();
-    player.lives = 98;
+    player.lives = 5;
     allowButtonClick = false;
     playADramaticIrony = false;
     tutorialVariables.tutorialPlayed = true;
