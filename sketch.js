@@ -448,6 +448,7 @@ function draw() {
 }
 
 function displaySongName() {
+  // Show the name and the artist of the song
   textFont(jsabFont);
   rectMode(CORNER);
   textAlign(LEFT);
