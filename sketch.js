@@ -238,6 +238,7 @@ let displayGradeVariables;
 let stars = 0;
 let winSound;
 let progressBar;
+let songName;
 
 // Load all assets
 function preload() {
@@ -374,6 +375,14 @@ function setup() {
     duration: 139000,
     levelStartedAt: 0,
   };
+
+  songName = {
+    xPos: width,
+    artistXPos: width,
+    animationState: "none",
+    song: "none",
+    artist: "none",
+  };
 }
 
 function draw() {
@@ -409,6 +418,7 @@ function draw() {
     displayGrade();
     displayPlayerAndLives();
     displayProgressBar();
+    displaySongName();
     transition();
     move();
     rectMode(CORNER);
@@ -429,10 +439,25 @@ function draw() {
     displayPlayerAndLives();
     showInstructions();
     displayProgressBar();
+    displaySongName();
     transition();
     move();
     rectMode(CORNER);
     whiteScreen();
+  }
+}
+
+function displaySongName() {
+  textFont(jsabFont);
+  rectMode(CORNER);
+  textAlign(LEFT);
+  if (songName.animationState === "entry") {
+    textSize(width/28);
+    fill(player.color);
+    text(songName.song, songName.xPos, height - width/10, 500);
+    textSize(width/40);
+    fill("white");
+    text(songName.artist, songName.artistXPos, height - width/20, 500);
   }
 }
 
@@ -556,8 +581,38 @@ function tutorial() {
     let square;
     let timeoutID;
     progressBar.levelStartedAt = millis();
-    progressBar.duration = 99000;
+    progressBar.duration = 103000;
     progressBar.progress = 0;
+
+    songName.song = "Pursuit";
+    songName.artist = "By: Shirobon";
+    songName.animationState = "entry";
+
+    setTimeout(() => {
+      for (let i = 0; i < 220; i++) {
+        setTimeout(() => {
+          songName.xPos--;
+        }, i * 1.5);
+      }
+      for (let i = 0; i < 260; i++) {
+        setTimeout(() => {
+          songName.artistXPos--;
+        }, i);
+      }
+    }, menuTransition.transitionTime + 500);
+
+    setTimeout(() => {
+      for (let i = 0; i < 220; i++) {
+        setTimeout(() => {
+          songName.xPos++;
+        }, i);
+      }
+      for (let i = 0; i < 260; i++) {
+        setTimeout(() => {
+          songName.artistXPos++;
+        }, i);
+      }
+    }, menuTransition.transitionTime + 3500);
 
     setTimeout(() => {
       tutorialVariables.music.play();
@@ -842,7 +897,7 @@ function tutorial() {
       timeouts.push(timeoutID);
 
     // Delay everything
-    }, 1000);
+    }, 5000);
     tutorialVariables.tutorialPlayed = false;
   }
 }
@@ -853,8 +908,38 @@ function aDramaticIrony() {
     let circle;
     let timeoutID;
     progressBar.levelStartedAt = millis();
-    progressBar.duration = 115000;
+    progressBar.duration = 119000;
     progressBar.progress = 0;
+
+    songName.song = "A Dramatic Irony";
+    songName.artist = "By: Hoyo-Mix";
+    songName.animationState = "entry";
+
+    setTimeout(() => {
+      for (let i = 0; i < 500; i++) {
+        setTimeout(() => {
+          songName.xPos--;
+        }, i);
+      }
+      for (let i = 0; i < 300; i++) {
+        setTimeout(() => {
+          songName.artistXPos--;
+        }, i * 2);
+      }
+    }, menuTransition.transitionTime + 500);
+
+    setTimeout(() => {
+      for (let i = 0; i < 500; i++) {
+        setTimeout(() => {
+          songName.xPos++;
+        }, i);
+      }
+      for (let i = 0; i < 300; i++) {
+        setTimeout(() => {
+          songName.artistXPos++;
+        }, i);
+      }
+    }, menuTransition.transitionTime + 3500);
 
     setTimeout(() => {
       aDramaticIronyMusic.play();
@@ -1291,7 +1376,7 @@ function aDramaticIrony() {
       timeouts.push(timeoutID);
 
     // Delay everything
-    }, 1000);
+    }, 5000);
     playADramaticIrony = false;
   }
 }
@@ -1559,7 +1644,7 @@ function displayPlayButton() {
         menuTransition.levelTransition = true;
         menuMusic.stop();
         menuTransition.transitionSound.play();
-        player.lives = 5;
+        player.lives = 10000;
         allowButtonClick = false;
         playADramaticIrony = true;
         tutorialVariables.tutorialPlayed = false;
@@ -1655,7 +1740,7 @@ function mousePressed() {
     menuTransition.levelTransition = true;
     menuMusic.stop();
     menuTransition.transitionSound.play();
-    player.lives = 5;
+    player.lives = 10000;
     allowButtonClick = false;
     playADramaticIrony = false;
     tutorialVariables.tutorialPlayed = true;
