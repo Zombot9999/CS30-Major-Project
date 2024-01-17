@@ -452,7 +452,7 @@ function displaySongName() {
   textFont(jsabFont);
   rectMode(CORNER);
   textAlign(LEFT);
-  if (songName.animationState === "entry") {
+  if (songName.animationState === "entry") { 
     textSize(width/28);
     fill(player.color);
     text(songName.song, songName.xPos, height - width/10, 500);
@@ -1645,7 +1645,7 @@ function displayPlayButton() {
         menuTransition.levelTransition = true;
         menuMusic.stop();
         menuTransition.transitionSound.play();
-        player.lives = 10000;
+        player.lives = 90;
         allowButtonClick = false;
         playADramaticIrony = true;
         tutorialVariables.tutorialPlayed = false;
@@ -1741,7 +1741,7 @@ function mousePressed() {
     menuTransition.levelTransition = true;
     menuMusic.stop();
     menuTransition.transitionSound.play();
-    player.lives = 10000;
+    player.lives = 90;
     allowButtonClick = false;
     playADramaticIrony = false;
     tutorialVariables.tutorialPlayed = true;
