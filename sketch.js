@@ -1645,7 +1645,7 @@ function displayPlayButton() {
         menuTransition.levelTransition = true;
         menuMusic.stop();
         menuTransition.transitionSound.play();
-        player.lives = 90;
+        player.lives = 5;
         allowButtonClick = false;
         playADramaticIrony = true;
         tutorialVariables.tutorialPlayed = false;
@@ -1741,7 +1741,7 @@ function mousePressed() {
     menuTransition.levelTransition = true;
     menuMusic.stop();
     menuTransition.transitionSound.play();
-    player.lives = 90;
+    player.lives = 5;
     allowButtonClick = false;
     playADramaticIrony = false;
     tutorialVariables.tutorialPlayed = true;
